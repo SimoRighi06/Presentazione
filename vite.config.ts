@@ -8,9 +8,7 @@ export default defineConfig({
     {
       name: 'bozze-proxy-middleware',
       configureServer(server) {
-        // Intercetta tutte le chiamate a /bozze-proxy/...
         server.middlewares.use('/bozze-proxy', (req, res) => {
-          // req.url è tipo "/hotellabussola/images/bozza01.jpg"
           const parts = req.url?.split('/').filter(Boolean) || [];
           const siteParam = parts[0];
           const restPath = parts.slice(1).join('/');
@@ -20,11 +18,7 @@ export default defineConfig({
             res.end('Parametro sito mancante');
             return;
           }
-
-          // Costruisce l'URL HTTP remoto reale
           const targetUrl = `http://${siteParam}.bozzasito.com/bozze/${restPath}`;
-
-          // Scarica l'immagine lato server Node.js e la invia al browser
           http
             .get(targetUrl, (targetRes) => {
               res.writeHead(targetRes.statusCode || 200, targetRes.headers);

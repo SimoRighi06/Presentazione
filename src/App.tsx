@@ -117,6 +117,15 @@ export default function App() {
     ? `/bozze-proxy/${siteParam}/images/${draftUrl}.jpg`
     : draftUrl;
 
+    /* !! DEBUGG   */
+console.group("🔍 DEBUG CARICAMENTO IMMAGINE");
+console.log("Input draftUrl:", draftUrl);
+console.log("Input siteParam:", siteParam);
+console.log("È una stringa semplice (isImage)?", isImage);
+console.log("URL Finale generato (imageUrl):", imageUrl);
+console.groupEnd();
+// --------------------
+
   // =========================================================
   // NOME CLIENTE
   // =========================================================
