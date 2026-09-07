@@ -9,7 +9,10 @@ import { ConfigPanel } from "./components/ConfigPan/ConfigPanel";
 import { CreditsPopupCard } from "./components/Floating/CreditCanvasCard";
 import { PresentationViewer } from "./components/Presentation/PresentationViewer";
 import { IndependentCustomCard } from "./components/Floating/CustomFloatingCard";
-import { type AppConfig, DEFAULT_CONFIG } from "./types/config";
+import { type AppConfig, DEFAULT_CONFIG, type AdminPsw } from "./types/config";
+import { AdminLoginGate } from "./components/Login/AdminLoginGate";
+import { type AdminLoginGateProps } from "./components/Login/AdminLoginGate";
+
 import "./App.css";
 
 // ✅ FIX: Funzione helper per estrarre il nome pulito da qualsiasi formato di dominio/URL
@@ -17,9 +20,9 @@ const getSiteParamFromDomain = (domain: string | undefined): string => {
   if (!domain) return "hotellabussola";
   return domain
     .replace(/^https?:\/\//i, "") // Rimuove http:// o https://
-    .replace(/^www\./i, "")       // Rimuove www.
-    .split("/")[0]                // Prende solo l'host, rimuove eventuali path
-    .split(".")[0];               // Prende la prima parte (es. "tecnoprogress" da "tecnoprogress.com")
+    .replace(/^www\./i, "") // Rimuove www.
+    .split("/")[0] // Prende solo l'host, rimuove eventuali path
+    .split(".")[0]; // Prende la prima parte (es. "tecnoprogress" da "tecnoprogress.com")
 };
 
 export default function App() {
@@ -35,10 +38,12 @@ export default function App() {
   );
   const stageRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   // ✅ NEW: Stato per tracciare il caricamento dell'immagine
   const [isImageLoading, setIsImageLoading] = useState(true);
-  
+
   // Gestore del cambio tab/bozza
   const [activeTab, setActiveTab] = useState<string>(
     config.navItems?.[0]?.id || "home",
@@ -50,7 +55,7 @@ export default function App() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("mode") === "admin") {
-      setIsConfigMode(true);
+      setShowAdminLogin(true);
     }
     fetch("/config.json")
       .then((res) => {
@@ -77,7 +82,7 @@ export default function App() {
           (e.code === "KeyC" || e.key.toLowerCase() === "c" || e.key === "ç"))
       ) {
         e.preventDefault();
-        setIsConfigMode((prev) => !prev);
+        setShowAdminLogin(true);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -110,12 +115,12 @@ export default function App() {
     : draftUrl;
 
   /* !! DEBUGG   */
-  console.group("🔍 DEBUG CARICAMENTO IMMAGINE");
+ /*  console.group("🔍 DEBUG CARICAMENTO IMMAGINE");
   console.log("Input draftUrl:", draftUrl);
   console.log("Input siteParam:", siteParam);
   console.log("È una stringa semplice (isImage)?", isImage);
   console.log("URL Finale generato (imageUrl):", imageUrl);
-  console.groupEnd();
+  console.groupEnd(); */
   // --------------------
 
   // =========================================================
@@ -230,6 +235,21 @@ export default function App() {
       ease: "power2.out",
     });
   };
+
+  if (showAdminLogin && !isAuthenticated) {
+  return (
+    <AdminLoginGate
+      onSuccess={() => {
+        setIsAuthenticated(true);
+        setShowAdminLogin(false);
+        setIsConfigMode(true);
+      }}
+      onCancel={() => {
+        setShowAdminLogin(false);
+      }}
+    />
+  );
+}
 
   const handleMouseLeaveStage = () => {
     setIsFocusedOnDraft(false);
@@ -353,7 +373,9 @@ export default function App() {
               <li
                 key={font}
                 className={
-                  index === 0 ? "fw-bold text-dark mt-2 fs-4" : "text-muted mt-2 fs-4"
+                  index === 0
+                    ? "fw-bold text-dark mt-2 fs-4"
+                    : "text-muted mt-2 fs-4"
                 }
               >
                 • {font}
@@ -448,10 +470,10 @@ export default function App() {
                         src={brandLogoUrl}
                         alt={`${clientName} Logo`}
                         className="mb-2"
-                        style={{ 
-                          maxHeight: "80px", 
+                        style={{
+                          maxHeight: "80px",
                           objectFit: "contain",
-                          opacity: 0.9
+                          opacity: 0.9,
                         }}
                         onError={(e) => {
                           // Se il logo non carica, nascondilo
@@ -463,9 +485,9 @@ export default function App() {
                         {clientName}
                       </h3>
                       {/* Spinner */}
-                      <Loader2 
-                        size={32} 
-                        className="text-secondary animate-spin mt-2" 
+                      <Loader2
+                        size={32}
+                        className="text-secondary animate-spin mt-2"
                       />
                       {/* Messaggio */}
                       <p className="text-muted small mb-0 mt-2">
@@ -483,7 +505,7 @@ export default function App() {
                     objectFit: "contain",
                     objectPosition: "top center",
                     opacity: isImageLoading ? 0 : 1,
-                    transition: "opacity 0.3s ease-in-out"
+                    transition: "opacity 0.3s ease-in-out",
                   }}
                   onLoad={() => setIsImageLoading(false)}
                   onError={(e) => {

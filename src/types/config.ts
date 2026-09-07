@@ -34,3 +34,7 @@ export const DEFAULT_CONFIG: AppConfig = {
     { id: "pagina1", label: "Pagina1", draftUrl: "bozza03", path: "#pagina1" },
   ],
 };
+
+export interface AdminPsw{
+  adminPassword?:string;
+}

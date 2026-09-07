@@ -148,6 +148,9 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
               src={tpLogo}
               alt="Tecnoprogress"
               style={{ height: "32px", objectFit: "contain" }}
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
             />
           </span>
         </div>

@@ -419,6 +419,7 @@ export const IndependentCustomCard: React.FC<IndependentCustomCardProps> = ({
                       loading="lazy"
                       decoding="async"
                       style={{ objectFit: "cover" }}
+                      fetchPriority="high"
                     />
                   </div>
                   <div
