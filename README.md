@@ -75,3 +75,65 @@ export default defineConfig([
 ```
 
 
+
+```
+presentazione2
+├─ README.md
+├─ REPORT_PRESTAZIONI_E_FLUSSI.md
+├─ eslint.config.js
+├─ index.html
+├─ package-lock.json
+├─ package.json
+├─ public
+│  ├─ Gilroy-ExtraBold.otf
+│  ├─ Gilroy-Light.otf
+│  ├─ favicon.svg
+│  └─ icons.svg
+├─ src
+│  ├─ App.css
+│  ├─ App.tsx
+│  ├─ assets
+│  │  ├─ hero.png
+│  │  ├─ logo-tp-black.svg
+│  │  ├─ react.svg
+│  │  ├─ tp_logo.png
+│  │  └─ vite.svg
+│  ├─ components
+│  │  ├─ ConfigPan
+│  │  │  └─ ConfigPanel.tsx
+│  │  ├─ Floating
+│  │  │  ├─ CreditCanvasCard.tsx
+│  │  │  ├─ CreditsPopupCard.tsx
+│  │  │  ├─ CustomFloatingCard.tsx
+│  │  │  ├─ FloatingCard.css
+│  │  │  ├─ FloatingCard.tsx
+│  │  │  └─ InfoPopupCard.tsx
+│  │  ├─ HUD
+│  │  │  ├─ FooterHUD.css
+│  │  │  ├─ FooterHUD.tsx
+│  │  │  ├─ HeaderHUD.css
+│  │  │  └─ HeaderHUD.tsx
+│  │  ├─ Presentation
+│  │  │  ├─ PresentationViewer.css
+│  │  │  └─ PresentationViewer.tsx
+│  │  ├─ XRayStage
+│  │  │  ├─ XRayStage.css
+│  │  │  └─ XRayStage.tsx
+│  │  └─ backgrounds
+│  │     └─ bg1
+│  │        ├─ Grainent.css
+│  │        └─ Grainent.tsx
+│  ├─ data
+│  │  └─ mockData.ts
+│  ├─ index.css
+│  ├─ main.tsx
+│  └─ types
+│     ├─ config.ts
+│     └─ project.ts
+├─ tsconfig.app.json
+├─ tsconfig.json
+├─ tsconfig.node.json
+├─ vercel.json
+└─ vite.config.ts
+
+```
