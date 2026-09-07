@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/bozze-proxy/:site/*"
+  to = "http://:site.bozzasito.com/bozze/:splat"
+  status = 200
+  force = true

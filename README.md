@@ -76,12 +76,15 @@ export default defineConfig([
 
 
 
+
 ```
 presentazione2
 ├─ README.md
 ├─ REPORT_PRESTAZIONI_E_FLUSSI.md
+├─ _redirects
 ├─ eslint.config.js
 ├─ index.html
+├─ netlify.toml
 ├─ package-lock.json
 ├─ package.json
 ├─ public
