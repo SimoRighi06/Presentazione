@@ -1,0 +1,17 @@
+
+.bottom-nav {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+}
+
+.btn-dark-glass {
+  background: rgba(0, 0, 0, 0.85) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.743) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}

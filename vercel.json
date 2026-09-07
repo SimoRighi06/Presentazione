@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/bozze-proxy/:site/:path*",
+      "destination": "http://:site.bozzasito.com/bozze/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

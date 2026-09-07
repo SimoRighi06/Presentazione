@@ -1,0 +1,127 @@
+:root {
+    --bg-canvas: #f2f4f7;
+    --glass-bg: rgba(255, 255, 255, 0.294);
+    --glass-border: rgba(255, 255, 255, 0.85);
+    --glass-shadow: 0 20px 45px rgba(150, 165, 185, 0.18);
+    --text-main: #2b2e35;
+    --text-muted: #747a85;
+
+    --font-ui: 'Outfit', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+
+.cloud-glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 20px;
+
+    /*
+     * IMPORTANTE:
+     * niente transition su transform.
+     * GSAP gestisce direttamente transform.
+     */
+    transition:
+        opacity 0.5s ease,
+        filter 0.5s ease,
+        z-index 0s;
+
+    will-change: transform, opacity, filter;
+}
+
+
+.cloud-glass-card:not(.center-stage-container) {
+    z-index: 30;
+}
+
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+
+.logo-badge {
+    width: 52px;
+    height: 52px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+
+.color-swatch-rect {
+    width: 48px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cloud-viewport.focus-active .cloud-glass-card:not(.center-stage-container) {
+  opacity: 1;
+  filter: blur(14px) saturate(1);
+  transition: filter 0.6s ease, opacity 0.6s ease;
+  z-index: 1 !important;
+  pointer-events: none;
+}
+
+
+
+.floating-card-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  z-index: 1000;
+  cursor: default;
+  animation: floatingCardOverlayIn 0.4s ease forwards;
+}
+
+@keyframes floatingCardOverlayIn {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+.cloud-glass-card {
+  isolation: isolate;
+}
+
+/* 1. Rimuovi zoom e imposta un font-size base ereditabile */
+.cloud-glass-card.is-expanded {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  
+  /* Aumenta la dimensione base del testo ereditata da tutti i figli */
+  font-size: 1.1rem; 
+}
+
+/* 2. Scala proporzionalmente tutto il blocco contenuti (testi, rettangoli colore, icone) */
+.cloud-glass-card.is-expanded > :not(button) {
+  transform: scale(1.2);
+  transform-origin: center center;
+  width: 70%;
+}
+
+/* 3. Se hai elementi con font-size inline o classi utility che non scalano */
+.cloud-glass-card.is-expanded .expansion-details,
+.cloud-glass-card.is-expanded p,
+.cloud-glass-card.is-expanded span {
+  font-size: inherit; /* Forza ad ereditare il font-size della card */
+}
