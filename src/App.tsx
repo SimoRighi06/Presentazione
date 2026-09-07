@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Palette, Type } from "lucide-react";
+import { Palette, Type, Loader2 } from "lucide-react";
 import gsap from "gsap";
-  
 import { FloatingCard } from "./components/Floating/FloatingCard";
 import { HeaderHUD } from "./components/HUD/HeaderHUD";
 import { FooterHUD } from "./components/HUD/FooterHUD";
@@ -10,9 +9,7 @@ import { ConfigPanel } from "./components/ConfigPan/ConfigPanel";
 import { CreditsPopupCard } from "./components/Floating/CreditCanvasCard";
 import { PresentationViewer } from "./components/Presentation/PresentationViewer";
 import { IndependentCustomCard } from "./components/Floating/CustomFloatingCard";
-
 import { type AppConfig, DEFAULT_CONFIG } from "./types/config";
-
 import "./App.css";
 
 // ✅ FIX: Funzione helper per estrarre il nome pulito da qualsiasi formato di dominio/URL
@@ -23,29 +20,25 @@ const getSiteParamFromDomain = (domain: string | undefined): string => {
     .replace(/^www\./i, "")       // Rimuove www.
     .split("/")[0]                // Prende solo l'host, rimuove eventuali path
     .split(".")[0];               // Prende la prima parte (es. "tecnoprogress" da "tecnoprogress.com")
-    
 };
 
 export default function App() {
   const [siteParam, setSiteParam] = useState("hotellabussola");
   const [activePage] = useState("1"); // usato per navigazione live .aspx
-
   const [draftUrl, setDraftUrl] = useState("bozza01");
-
   const isInteractive = true;
-
   const [isFocusedOnDraft, setIsFocusedOnDraft] = useState(false);
-
   const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
   const [isConfigMode, setIsConfigMode] = useState(false);
-
   const [viewMode, setViewMode] = useState<"admin" | "presentation" | "draft">(
     "admin",
   );
-
   const stageRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
+  
+  // ✅ NEW: Stato per tracciare il caricamento dell'immagine
+  const [isImageLoading, setIsImageLoading] = useState(true);
+  
   // Gestore del cambio tab/bozza
   const [activeTab, setActiveTab] = useState<string>(
     config.navItems?.[0]?.id || "home",
@@ -54,25 +47,20 @@ export default function App() {
   // =========================================================
   // CARICAMENTO CONFIG + MODALITÀ ADMIN + SCORCIATOIA
   // =========================================================
-
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-
     if (urlParams.get("mode") === "admin") {
       setIsConfigMode(true);
     }
-
     fetch("/config.json")
       .then((res) => {
         if (!res.ok) {
           throw new Error("config.json non trovato");
         }
-
         return res.json();
       })
       .then((data: AppConfig) => {
         setConfig(data);
-
         if (data.dominio) {
           // ✅ FIX: Usa la funzione helper per gestire anche URL completi
           setSiteParam(getSiteParamFromDomain(data.dominio));
@@ -92,44 +80,47 @@ export default function App() {
         setIsConfigMode((prev) => !prev);
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
   // =========================================================
+  // ✅ RESET LOADER QUANDO CAMBIA L'IMMAGINE
+  // =========================================================
+  useEffect(() => {
+    if (isImage) {
+      setIsImageLoading(true);
+    }
+  }, [draftUrl, siteParam]);
+
+  // =========================================================
   // CLIENT / LOGO
   // =========================================================
-
   const brandLogoUrl = `http://${siteParam}.bozzasito.com/bozze/images/logos/logo.svg`;
 
   // =========================================================
   // TIPO DI BOZZA
   // =========================================================
-
   const isImage =
     !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
-
   const imageUrl = isImage
     ? `/bozze-proxy/${siteParam}/images/${draftUrl}.jpg`
     : draftUrl;
 
-    /* !! DEBUGG   */
-console.group("🔍 DEBUG CARICAMENTO IMMAGINE");
-console.log("Input draftUrl:", draftUrl);
-console.log("Input siteParam:", siteParam);
-console.log("È una stringa semplice (isImage)?", isImage);
-console.log("URL Finale generato (imageUrl):", imageUrl);
-console.groupEnd();
-// --------------------
+  /* !! DEBUGG   */
+  console.group("🔍 DEBUG CARICAMENTO IMMAGINE");
+  console.log("Input draftUrl:", draftUrl);
+  console.log("Input siteParam:", siteParam);
+  console.log("È una stringa semplice (isImage)?", isImage);
+  console.log("URL Finale generato (imageUrl):", imageUrl);
+  console.groupEnd();
+  // --------------------
 
   // =========================================================
   // NOME CLIENTE
   // =========================================================
-
   const clientName = siteParam
     .replace(/-/g, " ")
     .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
@@ -137,27 +128,21 @@ console.groupEnd();
   // =========================================================
   // CAMBIO URL
   // =========================================================
-
   const handleUrlChange = (newUrl: string) => {
     if (newUrl === "live-reset") {
       setDraftUrl(
         `http://${siteParam}.bozzasito.com/bozze/bozza-preview.aspx#${activePage}`,
       );
-
       return;
     }
-
     setDraftUrl(newUrl);
-
     if (newUrl.startsWith("http")) {
       try {
         const urlObj = new URL(newUrl);
         const clientDomain = urlObj.hostname.split(".")[0];
-
         setSiteParam(clientDomain);
       } catch {
-        const match = newUrl.match(/https?:\/\/([^.]+)\.bozzasito.com/);
-
+        const match = newUrl.match(/https?:\/\/([^.]+)\.bozzasito\.com/);
         if (match?.[1]) {
           setSiteParam(match[1]);
         }
@@ -168,19 +153,16 @@ console.groupEnd();
   // =========================================================
   // PAGE ENTRANCE
   // =========================================================
-
   useEffect(() => {
     if (isConfigMode || viewMode !== "draft") {
       return;
     }
-
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         defaults: {
           ease: "power3.out",
         },
       });
-
       tl.fromTo(
         ".cloud-bg-canvas",
         { opacity: 0 },
@@ -219,7 +201,6 @@ console.groupEnd();
           "-=0.3",
         );
     }, containerRef);
-
     return () => {
       ctx.revert();
     };
@@ -228,25 +209,20 @@ console.groupEnd();
   // =========================================================
   // 3D TILT
   // =========================================================
-
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!stageRef.current) {
       return;
     }
-
     const rect = stageRef.current.getBoundingClientRect();
     const tiltFactor = isFocusedOnDraft ? 0.3 : 1;
-
     const rotateX =
       ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) *
       -3 *
       tiltFactor;
-
     const rotateY =
       ((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) *
       3 *
       tiltFactor;
-
     gsap.to(stageRef.current, {
       rotateX,
       rotateY,
@@ -272,12 +248,11 @@ console.groupEnd();
   // =========================================================
   // GESTIONE VISTE (ADMIN / PRESENTATION / DRAFT)
   // =========================================================
-
-  // 1. Se siamo in modalità Admin (`isConfigMode` attivo)
+  // 1. Se siamo in modalità Admin ( `isConfigMode`  attivo)
   if (isConfigMode) {
     return (
       <>
-        {/* Se l'utente clicca "Via Presentazione" dal pannello admin */}
+        {/* Se l'utente clicca  "Via Presentazione " dal pannello admin */}
         {viewMode === "presentation" && (
           <PresentationViewer
             siteParam={siteParam}
@@ -293,19 +268,16 @@ console.groupEnd();
             }}
           />
         )}
-
         {/* Pannello Admin standard */}
         {viewMode === "admin" && (
           <ConfigPanel
             initialConfig={config}
             onApplyConfig={(updatedConfig) => {
               setConfig(updatedConfig);
-              
               // ✅ FIX CRUCIALE: Aggiorna siteParam quando si salva la config dal pannello admin
               if (updatedConfig.dominio) {
                 setSiteParam(getSiteParamFromDomain(updatedConfig.dominio));
               }
-              
               setViewMode("draft");
               setIsConfigMode(false);
             }}
@@ -340,14 +312,12 @@ console.groupEnd();
   // =========================================================
   // MAIN (VISTA BOZZA SITO FINALE)
   // =========================================================
-
   return (
     <div
       ref={containerRef}
       className={`cloud-viewport ${isFocusedOnDraft ? "focus-active" : ""}`}
     >
       <div className="cloud-bg-canvas" />
-
       {/* HEADER HUD */}
       <HeaderHUD
         currentUrl={draftUrl}
@@ -356,7 +326,6 @@ console.groupEnd();
         onUrlChange={handleUrlChange}
         dominio={config.dominio || `${siteParam}.com`}
       />
-
       {/* MAIN STAGE */}
       <main className="d-flex flex-column align-items-center justify-content-center w-100 h-100 position-relative z-1">
         {/* CARD 01 — FONT */}
@@ -379,7 +348,6 @@ console.groupEnd();
             <Type size={16} />
             Font Utilizzati
           </div>
-
           <ul className="list-unstyled mb-0 ms-1 d-flex text-start ps-4 flex-column gap-2 mt-3">
             {config.fonts?.map((font, index) => (
               <li
@@ -393,10 +361,8 @@ console.groupEnd();
             ))}
           </ul>
         </FloatingCard>
-
         {/* CARD 02 — CREDITS */}
         <CreditsPopupCard azienda1="Tecnoprogress" />
-
         {/* CARD 03 — PALETTE */}
         <FloatingCard
           style={{ top: "18%", left: "2.5%", width: "300px" }}
@@ -417,7 +383,6 @@ console.groupEnd();
             <Palette size={16} />
             Palette Colori
           </div>
-
           <div className="d-flex flex-column gap-2 ms-1">
             {config.colors?.map((hex, index) => (
               <div
@@ -427,7 +392,6 @@ console.groupEnd();
                 <span className="font-monospace fs-4 fw-semibold text-uppercase">
                   {hex}
                 </span>
-
                 <div
                   className="color-swatch-rect"
                   style={{ backgroundColor: hex }}
@@ -436,9 +400,7 @@ console.groupEnd();
             ))}
           </div>
         </FloatingCard>
-
         <InfoPopupCard dominio={config.dominio || `${siteParam}.com`} />
-
         {/* CUSTOM CARD — configurabile dal pannello admin */}
         <IndependentCustomCard
           config={config}
@@ -453,14 +415,12 @@ console.groupEnd();
           speed={4.2}
           floatRotation={1.2}
         />
-
         {/* CENTRAL WEBSITE PREVIEW */}
         <div
           ref={stageRef}
           onMouseMove={handleMouseMove}
           onMouseEnter={() => {
             setIsFocusedOnDraft(true);
-
             if (stageRef.current) {
               gsap.to(stageRef.current, {
                 scale: 1.1,
@@ -475,10 +435,46 @@ console.groupEnd();
           <div className="draft-viewport w-100 h-100 overflow-hidden rounded-4">
             {isImage ? (
               <div
-                className="w-100 h-100 overflow-y-auto bg-white"
+                className="w-100 h-100 overflow-y-auto bg-white position-relative"
                 onWheel={(e) => e.stopPropagation()}
                 onTouchMove={(e) => e.stopPropagation()}
               >
+                {/* ✅ LOADER PERSONALIZZATO CON LOGO E NOME CLIENTE */}
+                {isImageLoading && (
+                  <div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white z-2">
+                    <div className="d-flex flex-column align-items-center gap-3">
+                      {/* Logo del cliente */}
+                      <img
+                        src={brandLogoUrl}
+                        alt={`${clientName} Logo`}
+                        className="mb-2"
+                        style={{ 
+                          maxHeight: "80px", 
+                          objectFit: "contain",
+                          opacity: 0.9
+                        }}
+                        onError={(e) => {
+                          // Se il logo non carica, nascondilo
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                      {/* Nome cliente */}
+                      <h3 className="fw-bold text-dark mb-0 fs-4">
+                        {clientName}
+                      </h3>
+                      {/* Spinner */}
+                      <Loader2 
+                        size={32} 
+                        className="text-secondary animate-spin mt-2" 
+                      />
+                      {/* Messaggio */}
+                      <p className="text-muted small mb-0 mt-2">
+                        Caricamento bozza in corso...
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {/* Immagine bozza */}
                 <img
                   src={imageUrl}
                   alt={`Bozza ${draftUrl}`}
@@ -486,8 +482,12 @@ console.groupEnd();
                   style={{
                     objectFit: "contain",
                     objectPosition: "top center",
+                    opacity: isImageLoading ? 0 : 1,
+                    transition: "opacity 0.3s ease-in-out"
                   }}
+                  onLoad={() => setIsImageLoading(false)}
                   onError={(e) => {
+                    setIsImageLoading(false);
                     e.currentTarget.src = `https://placehold.co/1920x1080/12161f/ffffff?text=Immagine+Bozza+non+trovata+(${draftUrl})`;
                   }}
                 />
@@ -507,7 +507,6 @@ console.groupEnd();
             )}
           </div>
         </div>
-
         <FooterHUD
           navItems={config.navItems}
           activeTab={activeTab}
