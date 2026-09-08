@@ -6,7 +6,6 @@
   --glass-shadow: 0 20px 45px rgba(150, 165, 185, 0.18);
   --text-main: #2b2e35;
   --text-muted: #747a85;
-
   --font-ui: 'Outfit', system-ui, -apple-system, sans-serif;
   --font-heading: 'Space Grotesk', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -174,4 +173,22 @@ h1 {
 
 .arancione{
   color: #FF6D00;
+}
+
+
+.draft-viewport>div {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.draft-viewport>div::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.card-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Imposta il numero massimo di righe che vuoi mostrare */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

@@ -20,6 +20,7 @@ export interface AppConfig {
   customCardTitle?: string;
   customCardText?: string;
   customCardImageUrl?: string;
+  customDescriptionPalette?: string;
 }
 
 export const DEFAULT_CONFIG: AppConfig = {

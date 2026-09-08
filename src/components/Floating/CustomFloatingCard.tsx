@@ -11,8 +11,6 @@ interface IndependentCustomCardProps {
     customCardImageUrl?: string;
   };
   style?: React.CSSProperties;
-
-  // Animazione (stessi default di FloatingCard)
   floatRange?: number;
   speed?: number;
   introDelay?: number;

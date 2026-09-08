@@ -18,6 +18,8 @@ interface ConfigPanelProps {
   initialConfig?: AppConfig & { navItems?: NavItem[] };
   onStartPresentation: () => void;
   onApplyConfig: (config: AppConfig & { navItems?: NavItem[] }) => void;
+  config: AppConfig;
+  updateConfig?: (newConfig: Partial<AppConfig>) => void;
 }
 
 export const ConfigPanel: React.FC<ConfigPanelProps> = ({
@@ -143,7 +145,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             <input
               type="text"
               className="form-control form-control-lg bg-light border-0"
-              value={config.dominio.toLowerCase().replace(/\s+/g, '')}
+              value={config.dominio.toLowerCase().replace(/\s+/g, "")}
               onChange={(e) =>
                 setConfig((prev) => ({ ...prev, dominio: e.target.value }))
               }
@@ -218,6 +220,27 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                   )}
                 </div>
               ))}
+              <div className="mb-3">
+                <label
+                  htmlFor="customDescriptionPalette"
+                  className="form-label small text-muted"
+                >
+                  Descrizione Palette
+                </label>
+                <textarea
+                  id="customDescriptionPalette"
+                  className="form-control text-dark border-secondary"
+                  placeholder="Inserisci una descrizione (lascia vuoto per nascondere)"
+                  rows={2}
+                  value={config.customDescriptionPalette || ""}
+                  onChange={(e) =>
+                    setConfig((prev) => ({
+                      ...prev,
+                      customDescriptionPalette: e.target.value,
+                    }))
+                  }
+                />
+              </div>
             </div>
           </div>
 
@@ -347,7 +370,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                           customCardTitle: e.target.value,
                         }))
                       }
-                      placeholder="Titolo (es. Focus Progetto)"
+                      placeholder="Titolo della card:"
                     />
                   </div>
 
@@ -370,7 +393,10 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                   {/* IMMAGINE CARD (Stesso sistema della texture) */}
                   <div className="col-12">
                     <label className="form-label text-uppercase fs-7 fw-bold text-muted mb-1">
-                      Immagine Custom
+                      Immagine Custom{" "}
+                      <span className="text-muted text-lowercase">
+                        (ottimale: 1920pxx1080px)
+                      </span>
                     </label>
                     <input
                       type="file"

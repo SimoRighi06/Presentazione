@@ -115,7 +115,7 @@ export default function App() {
     : draftUrl;
 
   /* !! DEBUGG   */
- /*  console.group("🔍 DEBUG CARICAMENTO IMMAGINE");
+  /*  console.group("🔍 DEBUG CARICAMENTO IMMAGINE");
   console.log("Input draftUrl:", draftUrl);
   console.log("Input siteParam:", siteParam);
   console.log("È una stringa semplice (isImage)?", isImage);
@@ -237,19 +237,19 @@ export default function App() {
   };
 
   if (showAdminLogin && !isAuthenticated) {
-  return (
-    <AdminLoginGate
-      onSuccess={() => {
-        setIsAuthenticated(true);
-        setShowAdminLogin(false);
-        setIsConfigMode(true);
-      }}
-      onCancel={() => {
-        setShowAdminLogin(false);
-      }}
-    />
-  );
-}
+    return (
+      <AdminLoginGate
+        onSuccess={() => {
+          setIsAuthenticated(true);
+          setShowAdminLogin(false);
+          setIsConfigMode(true);
+        }}
+        onCancel={() => {
+          setShowAdminLogin(false);
+        }}
+      />
+    );
+  }
 
   const handleMouseLeaveStage = () => {
     setIsFocusedOnDraft(false);
@@ -291,6 +291,7 @@ export default function App() {
         {/* Pannello Admin standard */}
         {viewMode === "admin" && (
           <ConfigPanel
+            config={config}
             initialConfig={config}
             onApplyConfig={(updatedConfig) => {
               setConfig(updatedConfig);
@@ -382,9 +383,26 @@ export default function App() {
               </li>
             ))}
           </ul>
+
+          {config.customDescriptionPalette && (
+            <div className="mt-4">
+              <p
+                className="mb-0 text-black text-start fs-6 border-top pt-3 text-break mt-3"
+                style={{
+                  whiteSpace: "pre-line",
+                  wordBreak: "break-word",
+                  overflowWrap: "anywhere",
+                }}
+              >
+                {config.customDescriptionPalette}
+              </p>
+            </div>
+          )}
         </FloatingCard>
+
         {/* CARD 02 — CREDITS */}
         <CreditsPopupCard azienda1="Tecnoprogress" />
+
         {/* CARD 03 — PALETTE */}
         <FloatingCard
           style={{ top: "18%", left: "2.5%", width: "300px" }}
@@ -422,6 +440,7 @@ export default function App() {
             ))}
           </div>
         </FloatingCard>
+
         <InfoPopupCard dominio={config.dominio || `${siteParam}.com`} />
         {/* CUSTOM CARD — configurabile dal pannello admin */}
         <IndependentCustomCard

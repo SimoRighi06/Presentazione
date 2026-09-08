@@ -126,11 +126,11 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
             <span className="text-white">Conosciamoci</span>
           </a>
 
-          <a href="https://www.instagram.com/tecnoprogress/">
+          <a href="https://www.instagram.com/tecnoprogress/" target="_blank">
             <i className="bi bi-instagram text-black fs-4 me-2"></i>
           </a>
 
-          <a href="https://it.linkedin.com/company/tecnoprogress">
+          <a href="https://it.linkedin.com/company/tecnoprogress" target="_blank">
             <i className="bi bi-linkedin text-black fs-4"></i>
           </a>
         </div>
