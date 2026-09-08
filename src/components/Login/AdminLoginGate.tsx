@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { HeaderHUD } from "../HUD/HeaderHUD";
 
 export interface AdminLoginGateProps {
   onSuccess: () => void;
@@ -42,12 +43,18 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
   return (
     <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
       style={{
-        background: "linear-gradient(135deg, #533117 0%, #aa5119 100%)",
-        zIndex: 9999,
+        background: "linear-gradient(135deg, #d9884b 0%, #aa5119 100%)",
+        zIndex: "9999",
       }}
     >
+    
+    <HeaderHUD currentUrl={""} dominio={""} onUrlChange={function (url: string): void {
+        throw new Error("Function not implemented.");
+      } }      
+    />
+
       <div
-        className={`cloud-glass-card p-5 rounded-4 shadow-lg ${shake ? "animate-shake" : ""}`}
+        className={`cloud-glass-card p-5 rounded-2 shadow-lg ${shake ? "animate-shake" : ""}`}
         style={{
           width: "100%",
           maxWidth: "400px",
