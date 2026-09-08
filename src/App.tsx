@@ -103,7 +103,7 @@ export default function App() {
   // =========================================================
   // CLIENT / LOGO
   // =========================================================
-  const brandLogoUrl = `http://${siteParam}.bozzasito.com/bozze/images/logos/logo.svg`;
+  const brandLogoUrl = `http://${siteParam}.bozzasito.com/bozze/images/logos/logo.png`;
 
   // =========================================================
   // TIPO DI BOZZA
