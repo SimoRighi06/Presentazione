@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
-import { HeaderHUD } from "../HUD/HeaderHUD";
-
+/* import { HeaderHUD } from "../HUD/HeaderHUD";
+ */
 export interface AdminLoginGateProps {
   onSuccess: () => void;
   onCancel: () => void;
@@ -48,10 +48,10 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
       }}
     >
     
-    <HeaderHUD currentUrl={""} dominio={""} onUrlChange={function (url: string): void {
+    {/* <HeaderHUD currentUrl={""} dominio={""} onUrlChange={function (url: string): void {
         throw new Error("Function not implemented.");
       } }      
-    />
+    /> */}
 
       <div
         className={`cloud-glass-card p-5 rounded-2 shadow-lg ${shake ? "animate-shake" : ""}`}

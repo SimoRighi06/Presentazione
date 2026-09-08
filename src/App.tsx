@@ -9,9 +9,9 @@ import { ConfigPanel } from "./components/ConfigPan/ConfigPanel";
 import { CreditsPopupCard } from "./components/Floating/CreditCanvasCard";
 import { PresentationViewer } from "./components/Presentation/PresentationViewer";
 import { IndependentCustomCard } from "./components/Floating/CustomFloatingCard";
-import { type AppConfig, DEFAULT_CONFIG, type AdminPsw } from "./types/config";
+import { type AppConfig, DEFAULT_CONFIG } from "./types/config";
 import { AdminLoginGate } from "./components/Login/AdminLoginGate";
-import { type AdminLoginGateProps } from "./components/Login/AdminLoginGate";
+/* import { type AdminLoginGateProps } from "./components/Login/AdminLoginGate"; */
 
 import "./App.css";
 
