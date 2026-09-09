@@ -139,7 +139,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         >
           {/* DOMINIO CLIENTE */}
           <div className="py-5 border-bottom">
-            <label className="form-label text-uppercase fs-7 fw-bold text-muted">
+            <label className="form-label text-uppercase fs-7 fw-bold text-muted" aria-label="Nome del dominio">
               Nome Dominio
             </label>
             <input
@@ -156,13 +156,15 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           {/* PALETTE COLORI */}
           <div className="py-5 border-bottom">
             <div className="d-flex justify-content-between align-items-center mb-2">
-              <label className="form-label text-uppercase fs-7 fw-bold text-muted m-0">
+              <label className="form-label text-uppercase fs-7 fw-bold text-muted m-0"
+                aria-label="Palette dei colori">
                 Palette Colori ({config.colors.length}/5)
               </label>
               {config.colors.length < 5 && (
                 <button
                   type="button"
                   className="btn btn-sm btn-outline-dark d-flex align-items-center gap-1 py-0 px-2"
+                  aria-label="Aggiungi il colore"
                   style={{ fontSize: "0.75rem" }}
                   onClick={() => {
                     setConfig((prev) => ({
@@ -186,6 +188,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                     type="color"
                     className="form-control form-control-color border-0 p-0 flex-shrink-0"
                     value={color}
+                    aria-label="colore numero 2"
                     onChange={(e) => {
                       const newColors = [...config.colors];
                       newColors[index] = e.target.value;
