@@ -105,13 +105,17 @@ export default function App() {
   const brandLogoUrl = `http://${siteParam}.bozzasito.com/images/logos/logo.png`;
 
   // =========================================================
-  // TIPO DI BOZZA
+  // TIPO DI BOZZA TODO: DA TESTARE ANCORA MEGLIO!!!!!!!!!!!!!!
   // =========================================================
   const isImage =
     !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
   const imageUrl = isImage
     ? `/bozze-proxy/${siteParam}/images/${draftUrl}.jpg`
     : draftUrl;
+
+  /*  const imageUrl = isImage
+  ? `/test.webp`  
+  : draftUrl; */  
 
   /* !! DEBUGG   */
   /*  console.group("🔍 DEBUG CARICAMENTO IMMAGINE");
@@ -525,6 +529,8 @@ export default function App() {
                     opacity: isImageLoading ? 0 : 1,
                     transition: "opacity 0.3s ease-in-out",
                   }}
+                  loading="eager"
+                  decoding="async"
                   onLoad={() => setIsImageLoading(false)}
                   onError={(e) => {
                     setIsImageLoading(false);
