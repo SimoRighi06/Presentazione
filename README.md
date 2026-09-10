@@ -3,6 +3,13 @@
 Questo documento fornisce una verifica completa di tutti i processi sincroni e asincroni dell'applicazione: ciclo di vita degli asset, pipeline di caricamento immagini, elaborazione PDF, animazioni e interazioni hardware-accelerated.
 
 ---
+```
+- git status
+- git add . 
+- git commit -m "testo"
+- git push origin main (nome branch)
+```
+---
 
 ## 1. Schema Architetturale dei Processi
 

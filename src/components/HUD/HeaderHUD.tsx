@@ -16,11 +16,13 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
   onUrlChange,
 }) => {
   const [inputValue, setInputValue] = useState(currentUrl);
+  const [prevUrl, setPrevUrl] = useState(currentUrl);
   const [isAdminMode, setIsAdminMode] = useState(false);
 
-  useEffect(() => {
-    setInputValue(currentUrl);
-  }, [currentUrl]);
+ if (currentUrl !== prevUrl) {
+  setPrevUrl(currentUrl);
+  setInputValue(currentUrl);
+}
 
   // Rilevamento automatico ?mode=admin o scorciatoia Alt + S
   useEffect(() => {

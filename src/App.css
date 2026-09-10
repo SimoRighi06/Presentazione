@@ -188,7 +188,7 @@ h1 {
 
 .card-description {
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Imposta il numero massimo di righe che vuoi mostrare */
+  /* -webkit-line-clamp: 3; */ /* Imposta il numero massimo di righe che vuoi mostrare */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

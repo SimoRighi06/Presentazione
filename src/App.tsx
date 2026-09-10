@@ -32,7 +32,10 @@ export default function App() {
   const isInteractive = true;
   const [isFocusedOnDraft, setIsFocusedOnDraft] = useState(false);
   const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
-  const [isConfigMode, setIsConfigMode] = useState(false);
+  const [isConfigMode, setIsConfigMode] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("mode") === "admin";
+  });
   const [viewMode, setViewMode] = useState<"admin" | "presentation" | "draft">(
     "admin",
   );
@@ -53,10 +56,6 @@ export default function App() {
   // CARICAMENTO CONFIG + MODALITÀ ADMIN + SCORCIATOIA
   // =========================================================
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("mode") === "admin") {
-      setShowAdminLogin(true);
-    }
     fetch("/config.json")
       .then((res) => {
         if (!res.ok) {
@@ -94,16 +93,16 @@ export default function App() {
   // =========================================================
   // ✅ RESET LOADER QUANDO CAMBIA L'IMMAGINE
   // =========================================================
-  useEffect(() => {
+  /* useEffect(() => {
     if (isImage) {
       setIsImageLoading(true);
     }
-  }, [draftUrl, siteParam]);
+  }, [draftUrl, siteParam]); */
 
   // =========================================================
   // CLIENT / LOGO
   // =========================================================
-  const brandLogoUrl = `http://${siteParam}.bozzasito.com/bozze/images/logos/logo.png`;
+  const brandLogoUrl = `http://${siteParam}.bozzasito.com/images/logos/logo.png`;
 
   // =========================================================
   // TIPO DI BOZZA

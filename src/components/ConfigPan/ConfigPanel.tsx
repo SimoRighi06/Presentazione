@@ -30,7 +30,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   const [config, setConfig] = useState<AppConfig & { navItems?: NavItem[] }>(
     () => ({
       ...initialConfig,
-      navItems: (initialConfig as any).navItems || DEFAULT_NAV_ITEMS,
+      navItems: initialConfig.navItems || DEFAULT_NAV_ITEMS,
     }),
   );
 
