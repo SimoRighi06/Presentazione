@@ -11,7 +11,7 @@ import { PresentationViewer } from "./components/Presentation/PresentationViewer
 import { IndependentCustomCard } from "./components/Floating/CustomFloatingCard";
 import { type AppConfig, DEFAULT_CONFIG } from "./types/config";
 import { AdminLoginGate } from "./components/Login/AdminLoginGate";
-import { useAppRouter, getSiteParamFromDomain } from "./hooks/useAppRouting"; 
+import { useAppRouter, getSiteParamFromDomain } from "./hooks/useAppRouting";
 import "./App.css";
 
 export default function App() {
@@ -41,7 +41,7 @@ export default function App() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [activeTab, setActiveTab] = useState<string>(
-    config.navItems?.[0]?.id || "home"
+    config.navItems?.[0]?.id || "home",
   );
 
   // =========================================================
@@ -66,7 +66,8 @@ export default function App() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
         (e.ctrlKey && e.shiftKey && e.code === "KeyC") ||
-        (e.altKey && (e.code === "KeyC" || e.key.toLowerCase() === "c" || e.key === "ç"))
+        (e.altKey &&
+          (e.code === "KeyC" || e.key.toLowerCase() === "c" || e.key === "ç"))
       ) {
         e.preventDefault();
         setShowAdminLogin(true);
@@ -79,9 +80,10 @@ export default function App() {
   // =========================================================
   // RESET LOADER QUANDO CAMBIA L'IMMAGINE
   // =========================================================
-  const isImage = !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
-  
- /*  useEffect(() => {
+  const isImage =
+    !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
+
+  /*  useEffect(() => {
     if (isImage) {
       setIsImageLoading(true);
     }
@@ -99,7 +101,9 @@ export default function App() {
     ? `/bozze-proxy/${siteParam}/images/${draftUrl}.webp`
     : draftUrl;
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>,
+  ) => {
     const img = e.currentTarget;
     if (img.src.endsWith(".webp")) {
       console.log(`WebP non trovato, provo JPG: ${draftUrl}`);
@@ -128,30 +132,33 @@ export default function App() {
   // CAMBIO URL
   // =========================================================
   const handleUrlChange = (newUrl: string) => {
-  if (newUrl === "live-reset") {
-    setDraftUrl(`http://${siteParam}.bozzasito.com/bozze/bozza-preview.aspx#${activePage}`);
-    setIsImageLoading(false); // È un iframe, niente loader immagine
-    return;
-  }
-  
-  setDraftUrl(newUrl);
-  
-  // ✅ RESETTA IL LOADER QUI, IN MODO SINCRONO E SICURO
-  const isImg = !newUrl.startsWith("http://") && !newUrl.startsWith("https://");
-  setIsImageLoading(isImg);
+    if (newUrl === "live-reset") {
+      setDraftUrl(
+        `http://${siteParam}.bozzasito.com/bozze/bozza-preview.aspx#${activePage}`,
+      );
+      setIsImageLoading(false); // È un iframe, niente loader immagine
+      return;
+    }
 
-  if (newUrl.startsWith("http")) {
-    try {
-      const urlObj = new URL(newUrl);
-      setSiteParam(getSiteParamFromDomain(urlObj.hostname));
-    } catch {
-      const match = newUrl.match(/https?:\/\/([^.]+)\.bozzasito\.com/);
-      if (match?.[1]) {
-        setSiteParam(getSiteParamFromDomain(match[1]));
+    setDraftUrl(newUrl);
+
+    // ✅ RESETTA IL LOADER QUI, IN MODO SINCRONO E SICURO
+    const isImg =
+      !newUrl.startsWith("http://") && !newUrl.startsWith("https://");
+    setIsImageLoading(isImg);
+
+    if (newUrl.startsWith("http")) {
+      try {
+        const urlObj = new URL(newUrl);
+        setSiteParam(getSiteParamFromDomain(urlObj.hostname));
+      } catch {
+        const match = newUrl.match(/https?:\/\/([^.]+)\.bozzasito\.com/);
+        if (match?.[1]) {
+          setSiteParam(getSiteParamFromDomain(match[1]));
+        }
       }
     }
-  }
-};
+  };
 
   // =========================================================
   // PAGE ENTRANCE ANIMATION
@@ -166,13 +173,13 @@ export default function App() {
           ".center-stage-container",
           { opacity: 0, y: 30, scale: 0.96 },
           { opacity: 1, y: 0, scale: 1, duration: 0.8 },
-          "-=0.5"
+          "-=0.5",
         )
         .fromTo(
           "header, .bottom-nav",
           { opacity: 0, y: -10 },
           { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 },
-          "-=0.3"
+          "-=0.3",
         );
     }, containerRef);
 
@@ -186,9 +193,15 @@ export default function App() {
     if (!stageRef.current) return;
     const rect = stageRef.current.getBoundingClientRect();
     const tiltFactor = isFocusedOnDraft ? 0.3 : 1;
-    const rotateX = ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -3 * tiltFactor;
-    const rotateY = ((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 3 * tiltFactor;
-    
+    const rotateX =
+      ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) *
+      -3 *
+      tiltFactor;
+    const rotateY =
+      ((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) *
+      3 *
+      tiltFactor;
+
     gsap.to(stageRef.current, {
       rotateX,
       rotateY,
@@ -264,7 +277,7 @@ export default function App() {
               }
               setViewMode("draft");
               setIsConfigMode(false);
-            } }
+            }}
             onStartPresentation={() => {
               setViewMode("presentation");
             }}
@@ -296,9 +309,12 @@ export default function App() {
   // MAIN (VISTA BOZZA SITO FINALE)
   // =========================================================
   return (
-    <div ref={containerRef} className={`cloud-viewport ${isFocusedOnDraft ? "focus-active" : ""}`}>
+    <div
+      ref={containerRef}
+      className={`cloud-viewport ${isFocusedOnDraft ? "focus-active" : ""}`}
+    >
       <div className="cloud-bg-canvas" />
-      
+
       <HeaderHUD
         currentUrl={draftUrl}
         brandLogoUrl={brandLogoUrl}
@@ -311,30 +327,47 @@ export default function App() {
         {/* CARD 01 — FONT */}
         <FloatingCard
           style={{ top: "40%", right: "5%", width: "330px" }}
-          introDelay={0.06}
-          introDuration={1.2}
-          stackX={-6}
+          introDelay={0.25}
+          introDuration={1.6}
+          stackX={-4}
           stackY={-4}
-          introRotation={-3}
-          introScale={0.98}
-          floatRange={12}
-          speed={4.2}
-          floatRotation={1.2}
+          introRotation={-1.5}
+          introScale={0.96}
+          floatRange={8}
+          speed={6.5}
+          floatRotation={0.6}
         >
-          <div className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2" style={{ fontSize: "inherit" }}>
+          <div
+            className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2"
+            style={{ fontSize: "inherit" }}
+          >
             <Type size={16} />
             Font Utilizzati
           </div>
           <ul className="list-unstyled mb-0 ms-1 d-flex text-start ps-4 flex-column gap-2 mt-3">
             {config.fonts?.map((font, index) => (
-              <li key={font} className={index === 0 ? "fw-bold text-dark mt-2 fs-4" : "text-muted mt-2 fs-4"}>
+              <li
+                key={font}
+                className={
+                  index === 0
+                    ? "fw-bold text-dark mt-2 fs-4"
+                    : "text-muted mt-2 fs-4"
+                }
+              >
                 • {font}
               </li>
             ))}
           </ul>
           {config.customDescriptionPalette && (
             <div className="mt-4">
-              <p className="mb-0 text-black text-start fs-6 border-top pt-3 text-break mt-3" style={{ whiteSpace: "pre-line", wordBreak: "break-word", overflowWrap: "anywhere" }}>
+              <p
+                className="mb-0 text-black text-start fs-6 border-top pt-3 text-break mt-3"
+                style={{
+                  whiteSpace: "pre-line",
+                  wordBreak: "break-word",
+                  overflowWrap: "anywhere",
+                }}
+              >
                 {config.customDescriptionPalette}
               </p>
             </div>
@@ -347,32 +380,43 @@ export default function App() {
         {/* CARD 03 — PALETTE */}
         <FloatingCard
           style={{ top: "18%", left: "2.5%", width: "300px" }}
-          introDelay={0}
-          introDuration={1.25}
-          stackX={0}
-          stackY={0}
-          introRotation={2}
-          introScale={1.08}
-          floatRange={15}
-          speed={4.5}
-          floatRotation={1.4}
+          introDelay={0.15}
+          introDuration={1.6} 
+          stackX={2} 
+          stackY={2} 
+          introRotation={3} 
+          introScale={1.04} 
+          floatRange={8} 
+          speed={3.5} 
+          floatRotation={0.5} 
         >
-          <div className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2" style={{ fontSize: "0.85rem" }}>
+          <div
+            className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2"
+            style={{ fontSize: "0.85rem" }}
+          >
             <Palette size={16} />
             Palette Colori
           </div>
           <div className="d-flex flex-column gap-2 ms-1">
             {config.colors?.map((hex, index) => (
-              <div key={index} className="d-flex align-items-center justify-content-around mt-3">
-                <span className="font-monospace fs-4 fw-semibold text-uppercase">{hex}</span>
-                <div className="color-swatch-rect" style={{ backgroundColor: hex }} />
+              <div
+                key={index}
+                className="d-flex align-items-center justify-content-around mt-3"
+              >
+                <span className="font-monospace fs-4 fw-semibold text-uppercase">
+                  {hex}
+                </span>
+                <div
+                  className="color-swatch-rect"
+                  style={{ backgroundColor: hex }}
+                />
               </div>
             ))}
           </div>
         </FloatingCard>
 
         <InfoPopupCard dominio={config.dominio || `${siteParam}.com`} />
-        
+
         {/* CUSTOM CARD */}
         <IndependentCustomCard
           config={config}
@@ -395,7 +439,11 @@ export default function App() {
           onMouseEnter={() => {
             setIsFocusedOnDraft(true);
             if (stageRef.current) {
-              gsap.to(stageRef.current, { scale: 1.1, duration: 0.7, ease: "power3.out" });
+              gsap.to(stageRef.current, {
+                scale: 1.1,
+                duration: 0.7,
+                ease: "power3.out",
+              });
             }
           }}
           onMouseLeave={handleMouseLeaveStage}
@@ -403,7 +451,11 @@ export default function App() {
         >
           <div className="draft-viewport w-100 h-100 overflow-hidden rounded-4">
             {isImage ? (
-              <div className="w-100 h-100 overflow-y-auto bg-white position-relative" onWheel={(e) => e.stopPropagation()} onTouchMove={(e) => e.stopPropagation()}>
+              <div
+                className="w-100 h-100 overflow-y-auto bg-white position-relative"
+                onWheel={(e) => e.stopPropagation()}
+                onTouchMove={(e) => e.stopPropagation()}
+              >
                 {isImageLoading && (
                   <div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white z-2">
                     <div className="d-flex flex-column align-items-center gap-3">
@@ -411,12 +463,25 @@ export default function App() {
                         src={brandLogoUrl}
                         alt={`${clientName} Logo`}
                         className="mb-2"
-                        style={{ maxHeight: "80px", objectFit: "contain", opacity: 0.5 }}
-                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        style={{
+                          maxHeight: "80px",
+                          objectFit: "contain",
+                          opacity: 0.5,
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
                       />
-                      <h3 className="fw-bold text-dark mb-0 fs-4">{clientName}</h3>
-                      <Loader2 size={32} className="text-secondary animate-spin mt-2" />
-                      <p className="text-muted small mb-0 mt-2">Caricamento bozza in corso...</p>
+                      <h3 className="fw-bold text-dark mb-0 fs-4">
+                        {clientName}
+                      </h3>
+                      <Loader2
+                        size={32}
+                        className="text-secondary animate-spin mt-2"
+                      />
+                      <p className="text-muted small mb-0 mt-2">
+                        Caricamento bozza in corso...
+                      </p>
                     </div>
                   </div>
                 )}
