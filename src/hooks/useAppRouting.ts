@@ -50,7 +50,7 @@ export const useAppRouter = (): UseAppRouterReturn => {
   }, []);
 
   // =========================================================
-  // SCORCIATOIA TASTIERA (Alt+C / Ctrl+Shift+C)
+  // SCORCIATOIA TASTIERA 
   // =========================================================
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

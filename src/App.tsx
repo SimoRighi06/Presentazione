@@ -32,7 +32,9 @@ export default function App() {
   const [isFocusedOnDraft, setIsFocusedOnDraft] = useState(false);
   const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem("admin_authenticated") === "true";
+  });
   const [isImageLoading, setIsImageLoading] = useState(true);
 
   const stageRef = useRef<HTMLDivElement>(null);
@@ -79,11 +81,11 @@ export default function App() {
   // =========================================================
   const isImage = !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
   
-  useEffect(() => {
+ /*  useEffect(() => {
     if (isImage) {
       setIsImageLoading(true);
     }
-  }, [draftUrl, siteParam, isImage]); // ✅ Dipendenze corrette
+  }, [draftUrl, siteParam, isImage]);  */
 
   // =========================================================
   // CLIENT / LOGO
@@ -116,7 +118,7 @@ export default function App() {
   };
 
   // =========================================================
-  // NOME CLIENTE
+  // NOME CLIENTxE
   // =========================================================
   const clientName = siteParam
     .replace(/-/g, " ")
@@ -126,23 +128,30 @@ export default function App() {
   // CAMBIO URL
   // =========================================================
   const handleUrlChange = (newUrl: string) => {
-    if (newUrl === "live-reset") {
-      setDraftUrl(`http://${siteParam}.bozzasito.com/bozze/bozza-preview.aspx#${activePage}`);
-      return;
-    }
-    setDraftUrl(newUrl);
-    if (newUrl.startsWith("http")) {
-      try {
-        const urlObj = new URL(newUrl);
-        setSiteParam(getSiteParamFromDomain(urlObj.hostname));
-      } catch {
-        const match = newUrl.match(/https?:\/\/([^.]+)\.bozzasito\.com/);
-        if (match?.[1]) {
-          setSiteParam(getSiteParamFromDomain(match[1]));
-        }
+  if (newUrl === "live-reset") {
+    setDraftUrl(`http://${siteParam}.bozzasito.com/bozze/bozza-preview.aspx#${activePage}`);
+    setIsImageLoading(false); // È un iframe, niente loader immagine
+    return;
+  }
+  
+  setDraftUrl(newUrl);
+  
+  // ✅ RESETTA IL LOADER QUI, IN MODO SINCRONO E SICURO
+  const isImg = !newUrl.startsWith("http://") && !newUrl.startsWith("https://");
+  setIsImageLoading(isImg);
+
+  if (newUrl.startsWith("http")) {
+    try {
+      const urlObj = new URL(newUrl);
+      setSiteParam(getSiteParamFromDomain(urlObj.hostname));
+    } catch {
+      const match = newUrl.match(/https?:\/\/([^.]+)\.bozzasito\.com/);
+      if (match?.[1]) {
+        setSiteParam(getSiteParamFromDomain(match[1]));
       }
     }
-  };
+  }
+};
 
   // =========================================================
   // PAGE ENTRANCE ANIMATION
@@ -203,7 +212,9 @@ export default function App() {
   // =========================================================
   // LOGIN GATE
   // =========================================================
-  if (showAdminLogin && !isAuthenticated) {
+  const needsLogin = (isConfigMode || showAdminLogin) && !isAuthenticated;
+
+  if (needsLogin) {
     return (
       <AdminLoginGate
         onSuccess={() => {
@@ -211,7 +222,12 @@ export default function App() {
           setShowAdminLogin(false);
           setIsConfigMode(true);
         }}
-        onCancel={() => setShowAdminLogin(false)}
+        onCancel={() => {
+          setShowAdminLogin(false);
+          if (viewMode === "admin") {
+            setViewMode("draft");
+          }
+        }}
       />
     );
   }

@@ -112,7 +112,6 @@ export const IndependentCustomCard: React.FC<IndependentCustomCardProps> = ({
     });
   };
 
-  // ✅ FIX: useCallback per evitare warning di dipendenze mancanti
   const closeCard = useCallback(() => {
     if (!cardRef.current || !isOpen) return;
     const card = cardRef.current;
@@ -167,7 +166,7 @@ export const IndependentCustomCard: React.FC<IndependentCustomCardProps> = ({
     }, cardRef);
 
     return () => { floatTweenRef.current?.kill(); ctx.revert(); };
-  }, []);
+  }, [isOpen]);
 
   /* ESC & SCROLL LOCK */
   useEffect(() => {
@@ -187,7 +186,6 @@ export const IndependentCustomCard: React.FC<IndependentCustomCardProps> = ({
     if (!isOpen) openCard(e);
   };
 
-  // ✅ FIX CRITICO: L'early return va DOPO tutti gli hook!
   if (!config.isCustomCardVisible) return null;
 
   return (

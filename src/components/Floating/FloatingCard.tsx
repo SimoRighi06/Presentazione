@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import "./FloatingCard.css";
 
@@ -233,7 +233,7 @@ export const FloatingCard = ({
   // =========================================================
   // CHIUSURA
   // =========================================================
-  const closeCard = () => {
+  const closeCard = useCallback(() => {
     if (!cardRef.current || !isExpanded) return;
 
     const card = cardRef.current;
@@ -332,7 +332,7 @@ export const FloatingCard = ({
         originalTransformRef.current = null;
       },
     });
-  };
+  }, [isExpanded]);
 
   // =========================================================
   // ANIMAZIONE INIZIALE
@@ -386,7 +386,7 @@ export const FloatingCard = ({
       floatTweenRef.current?.kill();
       ctx.revert();
     };
-  }, []);
+  }, [isExpanded]);
 
   // =========================================================
   // GESTIONE ESC & SCROLL
@@ -421,7 +421,7 @@ export const FloatingCard = ({
       document.body.style.overflow =
         previousOverflow;
     };
-  }, [isExpanded]);
+  }, [isExpanded, closeCard]);
 
   // =========================================================
   // CLICK CARD
@@ -444,7 +444,6 @@ export const FloatingCard = ({
       {/* =====================================================
           OVERLAY
       ===================================================== */}
-
       {isExpanded && (
         <div
           className="floating-card-overlay"

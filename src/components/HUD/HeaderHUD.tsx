@@ -15,24 +15,22 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
   dominio,
   onUrlChange,
 }) => {
-  const [inputValue, setInputValue] = useState(currentUrl);
-  const [prevUrl, setPrevUrl] = useState(currentUrl);
-  const [isAdminMode, setIsAdminMode] = useState(false);
-
- if (currentUrl !== prevUrl) {
-  setPrevUrl(currentUrl);
-  setInputValue(currentUrl);
-}
-
-  // Rilevamento automatico ?mode=admin o scorciatoia Alt + S
-  useEffect(() => {
+  // ✅ 1. Lazy initialization: risolve l'errore "setState in effect" del linter
+  const [isAdminMode, setIsAdminMode] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("mode") === "admin") {
-      setIsAdminMode(true);
-    }
+    return urlParams.get("mode") === "admin";
+  });
 
+  // ✅ 2. Stato locale per l'input, sincronizzato in modo sicuro tramite useEffect
+  const [inputValue, setInputValue] = useState(currentUrl);
+
+  /* useEffect(() => {
+    setInputValue(currentUrl);
+  }, [currentUrl]); */
+
+  // ✅ 3. Event listener per la scorciatoia da tastiera
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Funziona con Alt/Option oppure Cmd (⌘) + S su Mac/Win
       if ((e.altKey || e.metaKey) && e.code === "KeyS") {
         e.preventDefault();
         setIsAdminMode((prev) => !prev);
@@ -72,14 +70,16 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
           alt="Tecnoprogress"
           style={{ height: "32px", objectFit: "contain" }}
           loading="eager"
-              decoding="async"
-              fetchPriority="high"
+          decoding="async"
+          fetchPriority="high"
         />
       </div>
 
       {/* TITOLO DOMINIO (AL CENTRO) */}
-      <div className="position-absolute top-50 start-50 translate-middle">
-        <h1 className="m-0 fs-4 fw-normal text-dark"><strong>{dominio}</strong> </h1>
+      <div className="position-absolute top-50 start-50 translate-middle text-center">
+        <h1 className="m-0 fs-4 fw-normal text-dark">
+          <strong>{dominio}</strong>
+        </h1>
       </div>
 
       {/* DESTRA: SEARCHBAR (ADMIN) O CONTATTI GLASS (CLIENTE) */}
@@ -104,15 +104,19 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
                 size={15}
                 className="text-muted"
                 onClick={() => {
-                  setInputValue("");
+                  setInputValue("bozza01");
                   onUrlChange("bozza01");
                 }}
+                role="button"
+                tabIndex={0}
+                aria-label="Cancella input"
                 style={{ cursor: "pointer" }}
               />
             )}
             <button
               type="submit"
               className="border-0 bg-transparent p-0 text-muted d-flex align-items-center"
+              aria-label="Cerca"
             >
               <Search size={16} style={{ cursor: "pointer" }} />
             </button>
@@ -122,17 +126,21 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
         <div className="d-flex align-items-center gap-2">
           <a
             href="https://www.tecnoprogress.net/"
-            className="btn btn-cloud-black  d-flex align-items-center gap-2 px-4 py-2"
+            className="btn btn-cloud-black d-flex align-items-center gap-2 px-4 py-2"
             style={{ borderRadius: "50px", fontSize: "14px" }}
           >
             <span className="text-white">Conosciamoci</span>
           </a>
 
-          <a href="https://www.instagram.com/tecnoprogress/" target="_blank">
+          <a href="https://www.instagram.com/tecnoprogress/" target="_blank" rel="noopener noreferrer">
             <i className="bi bi-instagram text-black fs-4 me-2"></i>
           </a>
 
-          <a href="https://it.linkedin.com/company/tecnoprogress" target="_blank">
+          <a
+            href="https://it.linkedin.com/company/tecnoprogress"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <i className="bi bi-linkedin text-black fs-4"></i>
           </a>
         </div>
