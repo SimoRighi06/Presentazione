@@ -18,7 +18,7 @@ interface ConfigPanelProps {
   initialConfig?: AppConfig & { navItems?: NavItem[] };
   onStartPresentation: () => void;
   onApplyConfig: (config: AppConfig & { navItems?: NavItem[] }) => void;
-  config: AppConfig;
+  /* config: AppConfig; */
   updateConfig?: (newConfig: Partial<AppConfig>) => void;
 }
 
@@ -460,7 +460,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
 
               {uploadedFileName ? (
                 <div className="text-success fw-semibold small d-flex align-items-center justify-content-center gap-2">
-                  📄 {uploadedFileName}
+                  {uploadedFileName}
                 </div>
               ) : (
                 <div className="text-secondary small">

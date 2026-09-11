@@ -216,7 +216,7 @@ export const IndependentCustomCard: React.FC<IndependentCustomCardProps> = ({
             <div className="d-flex flex-column flex-grow-1 overflow-hidden">
               {hasImg && !hasText && (
                 <div className="w-100 h-100 bg-black">
-                  <img src={config.customCardImageUrl} alt="Custom Content" className="w-100 h-100" loading="lazy" decoding="async" style={{ objectFit: "cover" }} />
+                  <img src={config.customCardImageUrl} alt="Custom Content" className="w-100 h-100 px-3" loading="lazy" decoding="async" style={{ objectFit: "cover" }} />
                 </div>
               )}
               {!hasImg && hasText && (
@@ -227,7 +227,7 @@ export const IndependentCustomCard: React.FC<IndependentCustomCardProps> = ({
               {hasImg && hasText && (
                 <>
                   <div className="w-100 border-bottom pb-2" style={{ height: "65%" }}>
-                    <img src={config.customCardImageUrl} alt="Custom Content" className="w-100 h-100" loading="lazy" decoding="async" style={{ objectFit: "cover" }} fetchPriority="high" />
+                    <img src={config.customCardImageUrl} alt="Custom Content" className="w-100 h-100 px-3" loading="lazy" decoding="async" style={{ objectFit: "cover" }} fetchPriority="high" />
                   </div>
                   <div className="w-100 d-flex align-items-center justify-content-center px-5 text-start overflow-auto" style={{ height: "35%" }}>
                     <p className="fs-5 fw-medium text-dark lh-base m-0">{renderText(config.customCardText)}</p>

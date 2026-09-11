@@ -196,6 +196,16 @@ Sebbene l'esperienza sia ora fluida e priva di lag visibili, vi sono due flussi 
 | **Allocazione RAM Admin** | ~11 MB per immagine in state | **~40 byte (ObjectURL)** | Zero saturazione dello state React |
 | **Uniform Shader WebGL** | 5 TypedArray nuove per tick | **Mutazione in-place zero-alloc** | Garbage Collection non sollecitata |
 
+
+## Deploy
+Pulisci: Esegui npm run build sul branch production.
+Verifica: Controlla che nella cartella dist/ generata ci sia il file web.config insieme a index.html, alle cartelle assets/, ecc.
+Carica: Apri FileZilla, svuota la cartella di destinazione sul server aziendale.
+Trasferisci: Trascina tutto il contenuto della cartella dist/ (non la cartella dist stessa, ma i file dentro di essa) nella root del sito sul server.
+
+
+
+
 ```
 presentazione2
 ├─ README.md
