@@ -19,10 +19,12 @@ import "./App.css";
 const getSiteParamFromDomain = (domain: string | undefined): string => {
   if (!domain) return "hotellabussola";
   return domain
-    .replace(/^https?:\/\//i, "") // Rimuove http:// o https://
-    .replace(/^www\./i, "") // Rimuove www.
-    .split("/")[0] // Prende solo l'host, rimuove eventuali path
-    .split(".")[0]; // Prende la prima parte (es. "tecnoprogress" da "tecnoprogress.com")
+    .replace(/^https?:\/\//i, "")       // 1. Rimuove http:// o https://
+    .replace(/^www\./i, "")             // 2. Rimuove www.
+    .split("/")[0]                      // 3. Prende solo l'host, rimuove eventuali path
+    .split(".")[0]                      // 4. Prende la prima parte
+    .replace(/\s+/g, "")                // 5. Rimuove TUTTI gli spazi (unisce le parole)
+    .toLowerCase();                     // 6. Converte tutto in minuscolo
 };
 
 export default function App() {
@@ -93,11 +95,11 @@ export default function App() {
   // =========================================================
   // ✅ RESET LOADER QUANDO CAMBIA L'IMMAGINE
   // =========================================================
-  /* useEffect(() => {
+  useEffect(() => {
     if (isImage) {
       setIsImageLoading(true);
     }
-  }, [draftUrl, siteParam]); */
+  }, [draftUrl, siteParam]);
 
   // =========================================================
   // CLIENT / LOGO
@@ -105,17 +107,48 @@ export default function App() {
   const brandLogoUrl = `http://${siteParam}.bozzasito.com/images/logos/logo.png`;
 
   // =========================================================
-  // TIPO DI BOZZA TODO: DA TESTARE ANCORA MEGLIO!!!!!!!!!!!!!!
+  // TIPO DI BOZZA (jpeg webgP) TODO: DA TESTARE ANCORA MEGLIO!!!!!!!!!!!!!!
   // =========================================================
-  const isImage =
+  /* const isImage =
     !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
   const imageUrl = isImage
     ? `/bozze-proxy/${siteParam}/images/${draftUrl}.jpg`
+    : draftUrl; */
+
+  const isImage =
+    !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
+
+  // ✅ STRATEGIA RIDONDANTE: Prova prima WebP, poi JPG, poi placeholder
+  const imageUrl = isImage
+    ? `/bozze-proxy/${siteParam}/images/${draftUrl}.webp` // ← Prima prova WebP
     : draftUrl;
+
+  // Handler per il fallback a cascata
+   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = e.currentTarget;
+    // 1. Se stiamo provando il WebP e fallisce, prova il JPG
+    if (img.src.endsWith(".webp")) {
+      console.log(`WebP non trovato, provo JPG: ${draftUrl}`);
+      setIsImageLoading(true); // Mantieni il loader attivo mentre prova il JPG
+      img.src = `/bozze-proxy/${siteParam}/images/${draftUrl}.jpg`;
+      return;
+    }
+
+    // 2. Se anche il JPG fallisce, mostra il placeholder
+    if (img.src.endsWith(".jpg") && !img.src.includes("placehold.co")) {
+      console.warn(`JPG non trovato, mostro placeholder: ${draftUrl}`);
+      setIsImageLoading(false); // Spegni il loader
+      img.src = `https://placehold.co/1920x1080/12161f/ffffff?text=Immagine+Bozza+non+trovata+(${draftUrl})`;
+      return;
+    }
+    
+    // 3. Fallback finale di sicurezza
+    setIsImageLoading(false);
+  };
 
   /*  const imageUrl = isImage
   ? `/test.webp`  
-  : draftUrl; */  
+  : draftUrl; */
 
   /* !! DEBUGG   */
   /*  console.group("🔍 DEBUG CARICAMENTO IMMAGINE");
@@ -495,7 +528,7 @@ export default function App() {
                         style={{
                           maxHeight: "80px",
                           objectFit: "contain",
-                          opacity: 0.9,
+                          opacity: 0.5,
                         }}
                         onError={(e) => {
                           // Se il logo non carica, nascondilo
@@ -523,19 +556,13 @@ export default function App() {
                   src={imageUrl}
                   alt={`Bozza ${draftUrl}`}
                   className="w-100 d-block h-auto"
+                  decoding="async"
                   style={{
                     objectFit: "contain",
                     objectPosition: "top center",
-                    opacity: isImageLoading ? 0 : 1,
-                    transition: "opacity 0.3s ease-in-out",
                   }}
-                  loading="eager"
-                  decoding="async"
                   onLoad={() => setIsImageLoading(false)}
-                  onError={(e) => {
-                    setIsImageLoading(false);
-                    e.currentTarget.src = `https://placehold.co/1920x1080/12161f/ffffff?text=Immagine+Bozza+non+trovata+(${draftUrl})`;
-                  }}
+                  onError={handleImageError}
                 />
               </div>
             ) : (
