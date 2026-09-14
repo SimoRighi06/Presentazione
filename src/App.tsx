@@ -15,7 +15,6 @@ import { useAppRouter, getSiteParamFromDomain } from "./hooks/useAppRouting";
 import "./App.css";
 
 export default function App() {
-  // ✅ 1. ROUTING E STATO GLOBALE
   const {
     viewMode,
     isConfigMode,
@@ -25,7 +24,6 @@ export default function App() {
     setSiteParam,
   } = useAppRouter();
 
-  // ✅ 2. STATI LOCALI
   const [activePage] = useState("1");
   const [draftUrl, setDraftUrl] = useState("bozza01");
   const isInteractive = true;
@@ -89,7 +87,8 @@ export default function App() {
     } else {
       setIsImageLoading(false); 
     }
-  }, [draftUrl, siteParam, isImage]); */
+  }, [draftUrl, siteParam, isImage]); */  
+
 
   // =========================================================
   // 🚀 PREFETCHING INTELLIGENTE (Elimina il delay al click)

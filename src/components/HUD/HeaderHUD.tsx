@@ -129,6 +129,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
             href="https://www.tecnoprogress.net/"
             className="btn btn-cloud-black d-flex align-items-center gap-2 px-4 py-2"
             style={{ borderRadius: "50px", fontSize: "14px" }}
+            target="_blank"
           >
             <span className="text-white">Conosciamoci</span>
           </a>
