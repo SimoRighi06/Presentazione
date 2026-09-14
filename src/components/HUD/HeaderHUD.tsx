@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import tpLogo from "../../assets/logo-tp-black.svg";
+import { Instagram, Linkedin } from 'react-bootstrap-icons';
 
 interface HeaderHUDProps {
   currentUrl: string;
@@ -133,7 +134,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
           </a>
 
           <a href="https://www.instagram.com/tecnoprogress/" target="_blank" rel="noopener noreferrer">
-            <i className="bi bi-instagram text-black fs-4 me-2"></i>
+            <Instagram color="black" size={24}/>
           </a>
 
           <a
@@ -141,10 +142,12 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
             target="_blank"
             rel="noopener noreferrer"
           >
-            <i className="bi bi-linkedin text-black fs-4"></i>
+            <Linkedin color="black" size={24} />
           </a>
         </div>
       )}
     </header>
   );
 };
+
+

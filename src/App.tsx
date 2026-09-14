@@ -15,7 +15,7 @@ import { useAppRouter, getSiteParamFromDomain } from "./hooks/useAppRouting";
 import "./App.css";
 
 export default function App() {
-  // ✅ 1. USA L'HOOK PER TUTTO IL ROUTING E STATO GLOBALE (Niente più useState duplicati!)
+  // ✅ 1. ROUTING E STATO GLOBALE
   const {
     viewMode,
     isConfigMode,
@@ -25,7 +25,7 @@ export default function App() {
     setSiteParam,
   } = useAppRouter();
 
-  // ✅ 2. STATI LOCALI (solo quelli specifici di questa vista)
+  // ✅ 2. STATI LOCALI
   const [activePage] = useState("1");
   const [draftUrl, setDraftUrl] = useState("bozza01");
   const isInteractive = true;
@@ -78,21 +78,81 @@ export default function App() {
   }, [setSiteParam]);
 
   // =========================================================
-  // RESET LOADER QUANDO CAMBIA L'IMMAGINE
+  // ✅ RESET LOADER QUANDO CAMBIA L'IMMAGINE (Fondamentale)
   // =========================================================
   const isImage =
     !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
 
-  /*  useEffect(() => {
+  /*   useEffect(() => {
     if (isImage) {
-      setIsImageLoading(true);
+      setIsImageLoading(true); 
+    } else {
+      setIsImageLoading(false); 
     }
-  }, [draftUrl, siteParam, isImage]);  */
+  }, [draftUrl, siteParam, isImage]); */
 
   // =========================================================
-  // CLIENT / LOGO
+  // 🚀 PREFETCHING INTELLIGENTE (Elimina il delay al click)
   // =========================================================
-  const brandLogoUrl = `http://${siteParam}.bozzasito.com/images/logos/logo.png`;
+  useEffect(() => {
+    if (!config.navItems || config.navItems.length === 0) return;
+
+    const currentIndex = config.navItems.findIndex(
+      (item) => item.draftUrl === draftUrl || item.id === draftUrl,
+    );
+
+    if (currentIndex === -1) return;
+
+    // Precarica la successiva e quella dopo ancora
+    const indicesToPrefetch = [currentIndex + 1, currentIndex + 2].filter(
+      (i) => i < config.navItems.length,
+    );
+
+    const prefetchImage = (targetDraftUrl: string) => {
+      if (!targetDraftUrl || targetDraftUrl.startsWith("http")) return;
+
+      // ✅ FIX: Per il prefetch in background, carichiamo direttamente il .jpg
+      // per evitare spam di 404 in console, sapendo che è il fallback garantito.
+      // La logica WebP -> JPG rimane attiva per l'immagine principale a schermo.
+      const url = `/bozze-proxy/${siteParam}/images/${targetDraftUrl}.jpg`;
+
+      const img = new Image();
+      img.src = url;
+      img.loading = "eager"; // Priorità massima di download
+    };
+
+    const schedulePrefetch = () => {
+      // ✅ FIX: Tipizzazione corretta senza usare 'any'
+      const win = window as Window &
+        typeof globalThis & {
+          requestIdleCallback?: (cb: IdleRequestCallback) => number;
+        };
+
+      if (win.requestIdleCallback) {
+        win.requestIdleCallback(() => {
+          indicesToPrefetch.forEach((i) => {
+            const item = config.navItems[i];
+            if (item?.draftUrl) prefetchImage(item.draftUrl);
+          });
+        });
+      } else {
+        // Fallback per browser che non supportano requestIdleCallback
+        setTimeout(() => {
+          indicesToPrefetch.forEach((i) => {
+            const item = config.navItems[i];
+            if (item?.draftUrl) prefetchImage(item.draftUrl);
+          });
+        }, 500);
+      }
+    };
+
+    schedulePrefetch();
+  }, [draftUrl, siteParam, config.navItems]);
+
+  // =========================================================
+  // CLIENT / LOGO (✅ FIX HTTPS per Mixed Content)
+  // =========================================================
+  const brandLogoUrl = `https://${siteParam}.bozzasito.com/bozze/images/logos/logo.png`;
 
   // =========================================================
   // TIPO DI BOZZA (Fallback WebP -> JPG)
@@ -107,7 +167,7 @@ export default function App() {
     const img = e.currentTarget;
     if (img.src.endsWith(".webp")) {
       console.log(`WebP non trovato, provo JPG: ${draftUrl}`);
-      setIsImageLoading(true);
+      setIsImageLoading(true); // Mantieni loader attivo durante il fallback
       img.src = `/bozze-proxy/${siteParam}/images/${draftUrl}.jpg`;
       return;
     }
@@ -122,7 +182,7 @@ export default function App() {
   };
 
   // =========================================================
-  // NOME CLIENTxE
+  // NOME CLIENTE
   // =========================================================
   const clientName = siteParam
     .replace(/-/g, " ")
@@ -134,15 +194,15 @@ export default function App() {
   const handleUrlChange = (newUrl: string) => {
     if (newUrl === "live-reset") {
       setDraftUrl(
-        `http://${siteParam}.bozzasito.com/bozze/bozza-preview.aspx#${activePage}`,
+        `https://${siteParam}.bozzasito.com/bozze/bozza-preview.aspx#${activePage}`,
       );
-      setIsImageLoading(false); // È un iframe, niente loader immagine
+      setIsImageLoading(false); // È un iframe, spegni subito il loader
       return;
     }
 
     setDraftUrl(newUrl);
 
-    // ✅ RESETTA IL LOADER QUI, IN MODO SINCRONO E SICURO
+    // ✅ RESETTA IL LOADER QUI, IN MODO SINCRONO E SICURO (senza useEffect)
     const isImg =
       !newUrl.startsWith("http://") && !newUrl.startsWith("https://");
     setIsImageLoading(isImg);
@@ -269,7 +329,6 @@ export default function App() {
         {viewMode === "admin" && (
           <ConfigPanel
             initialConfig={config}
-            /* config={config} */
             onApplyConfig={(updatedConfig) => {
               setConfig(updatedConfig);
               if (updatedConfig.dominio) {
@@ -324,7 +383,7 @@ export default function App() {
       />
 
       <main className="d-flex flex-column align-items-center justify-content-center w-100 h-100 position-relative z-1">
-        {/* CARD 01 — FONT */}
+        {/* CARD 01 — FONT (Animazione Premium Lenta) */}
         <FloatingCard
           style={{ top: "40%", right: "5%", width: "330px" }}
           introDelay={0.25}
@@ -377,18 +436,18 @@ export default function App() {
         {/* CARD 02 — CREDITS */}
         <CreditsPopupCard azienda1="Tecnoprogress" />
 
-        {/* CARD 03 — PALETTE */}
+        {/* CARD 03 — PALETTE (Animazione Premium Lenta) */}
         <FloatingCard
           style={{ top: "18%", left: "2.5%", width: "300px" }}
           introDelay={0.15}
-          introDuration={1.6} 
-          stackX={2} 
-          stackY={2} 
-          introRotation={3} 
-          introScale={1.04} 
-          floatRange={8} 
-          speed={3.5} 
-          floatRotation={0.5} 
+          introDuration={1.6}
+          stackX={2}
+          stackY={2}
+          introRotation={1}
+          introScale={1.04}
+          floatRange={8}
+          speed={6.5}
+          floatRotation={0.5}
         >
           <div
             className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2"
@@ -456,6 +515,7 @@ export default function App() {
                 onWheel={(e) => e.stopPropagation()}
                 onTouchMove={(e) => e.stopPropagation()}
               >
+                {/* ✅ LOADER: Sparisce ISTANTANEAMENTE grazie a onLoad sull'img sotto */}
                 {isImageLoading && (
                   <div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white z-2">
                     <div className="d-flex flex-column align-items-center gap-3">
@@ -485,6 +545,8 @@ export default function App() {
                     </div>
                   </div>
                 )}
+
+                {/* ✅ IMMAGINE: onLoad spegne il loader non appena è pronta (0ms di delay se in cache) */}
                 <img
                   src={imageUrl}
                   alt={`Bozza ${draftUrl}`}
@@ -500,7 +562,11 @@ export default function App() {
                 key={draftUrl}
                 src={draftUrl}
                 title="Anteprima Bozza Cliente"
-                className={`w-100 h-100 border-0 d-block bg-white ${isInteractive ? "interactive-iframe" : "non-interactive-iframe"}`}
+                className={`w-100 h-100 border-0 d-block bg-white ${
+                  isInteractive
+                    ? "interactive-iframe"
+                    : "non-interactive-iframe"
+                }`}
                 loading="eager"
               />
             )}
