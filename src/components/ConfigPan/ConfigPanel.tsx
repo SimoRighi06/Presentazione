@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { type AppConfig, DEFAULT_CONFIG } from "../../types/config";
 import { Download, Play, Plus, Trash2 } from "lucide-react";
+import { ShareLinkGenerator } from "../../clientLink";
 
 // Nav item interface
 export interface NavItem {
@@ -139,7 +140,10 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         >
           {/* DOMINIO CLIENTE */}
           <div className="py-5 border-bottom">
-            <label className="form-label text-uppercase fs-7 fw-bold text-muted" aria-label="Nome del dominio">
+            <label
+              className="form-label text-uppercase fs-7 fw-bold text-muted"
+              aria-label="Nome del dominio"
+            >
               Nome Dominio
             </label>
             <input
@@ -156,8 +160,10 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           {/* PALETTE COLORI */}
           <div className="py-5 border-bottom">
             <div className="d-flex justify-content-between align-items-center mb-2">
-              <label className="form-label text-uppercase fs-7 fw-bold text-muted m-0"
-                aria-label="Palette dei colori">
+              <label
+                className="form-label text-uppercase fs-7 fw-bold text-muted m-0"
+                aria-label="Palette dei colori"
+              >
                 Palette Colori ({config.colors.length}/5)
               </label>
               {config.colors.length < 5 && (
@@ -533,6 +539,8 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           >
             ▶ Via Presentazione
           </button>
+            <ShareLinkGenerator siteParam={config.dominio} />
+
         </form>
       </div>
     </div>

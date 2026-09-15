@@ -13,6 +13,7 @@ import { type AppConfig, DEFAULT_CONFIG } from "./types/config";
 import { AdminLoginGate } from "./components/Login/AdminLoginGate";
 import { useAppRouter, getSiteParamFromDomain } from "./hooks/useAppRouting";
 import "./App.css";
+import { useClientView, isClientView } from "./clientLink";
 
 export default function App() {
   const {
@@ -24,6 +25,7 @@ export default function App() {
     setSiteParam,
   } = useAppRouter();
 
+  useClientView(setSiteParam, setViewMode, setIsConfigMode)
   const [activePage] = useState("1");
   const [draftUrl, setDraftUrl] = useState("bozza01");
   const isInteractive = true;
@@ -62,14 +64,15 @@ export default function App() {
       });
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        (e.ctrlKey && e.shiftKey && e.code === "KeyC") ||
-        (e.altKey &&
-          (e.code === "KeyC" || e.key.toLowerCase() === "c" || e.key === "ç"))
-      ) {
-        e.preventDefault();
-        setShowAdminLogin(true);
-      }
+      if (isClientView()) return;
+        if (
+          (e.ctrlKey && e.shiftKey && e.code === "KeyC") ||
+          (e.altKey &&
+            (e.code === "KeyC" || e.key.toLowerCase() === "c" || e.key === "ç"))
+        ) {
+          e.preventDefault();
+          setShowAdminLogin(true);
+        }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -569,7 +572,8 @@ export default function App() {
                 loading="eager"
               />
             )}
-          </div>
+          </div> 
+          
         </div>
 
         <FooterHUD
