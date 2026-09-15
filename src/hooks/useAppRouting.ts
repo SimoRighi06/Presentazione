@@ -33,13 +33,11 @@ export const getSiteParamFromDomain = (domain: string | undefined): string => {
 // CUSTOM HOOK: useAppRouter
 // =========================================================
 export const useAppRouter = (): UseAppRouterReturn => {
-  // ✅ Lazy initialization: leggi l'URL solo al primo render
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get("mode") === "admin" ? "admin" : "draft";
   });
 
-  // ✅ isConfigMode è DERIVATO da viewMode (Single Source of Truth)
   const isConfigMode = viewMode === "admin";
 
   const [siteParam, setSiteParam] = useState<string>("hotellabussola");
