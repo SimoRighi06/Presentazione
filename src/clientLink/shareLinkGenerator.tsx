@@ -27,9 +27,6 @@ export const ShareLinkGenerator: React.FC<ShareLinkGeneratorProps> = ({ sitePara
         <LinkIcon size={20} className="text-primary" />
         <h5 className="mb-0 fw-bold">Link per il Cliente</h5>
       </div>
-      <p className="text-muted small mb-3">
-        Invia questo link al cliente. La modalità configurazione sarà automaticamente disabilitata.
-      </p>
       
       <div className="d-flex gap-2">
         <input 
