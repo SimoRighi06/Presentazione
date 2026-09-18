@@ -34,8 +34,8 @@ export const getSiteParamFromDomain = (domain: string | undefined): string => {
 // =========================================================
 export const useAppRouter = (): UseAppRouterReturn => {
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get("mode") === "admin" ? "admin" : "draft";
+    /* const urlParams = new URLSearchParams(window.location.search); */
+    return window.location.pathname === "/area" ? "admin" : "draft";
   });
 
   const isConfigMode = viewMode === "admin";

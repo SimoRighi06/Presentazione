@@ -1,7 +1,7 @@
 {
-  "dominio": "hotellabussola.com",
+  "dominio": "hotellabussola",
   "hasPresentation": true,
-  "presentationUrl": "presentazione.pdf",
+  "presentationUrl": ".pdf",
   "colors": [
     "#2B2B2B",
     "#E2D3C3",

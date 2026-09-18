@@ -24,13 +24,11 @@ interface OriginalCardState {
   y: number;
   width: string | number | undefined;
   height: string | number | undefined;
-
   position: string;
   left: string;
   top: string;
   right: string;
   bottom: string;
-
   rectLeft: number;
   rectTop: number;
   rectWidth: number;
@@ -42,196 +40,117 @@ export const FloatingCard = ({
   expandedContent,
   className = "",
   style = {},
-  floatRange = 16,
-  speed = 4,
-  introDelay = 0,
-  introDuration = 1.15,
+  // ✅ DEFAULT OTTIMIZZATI: Più lenti, più "respiranti" e premium
+  floatRange = 8,
+  speed = 6.5,
+  introDelay = 0.2,
+  introDuration = 1.4,
   stackX = 0,
   stackY = 0,
   introRotation = 0,
-  introScale = 1,
-  floatRotation = 1.5,
+  introScale = 0.98,
+  floatRotation = 0.5,
 }: FloatingCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const floatTweenRef = useRef<gsap.core.Tween | null>(null);
-
-  // Ref per catturare i valori delle props di animazione (stabili, non cambiano a runtime)
-  const animPropsRef = useRef({
-    floatRange, speed, introDelay, introDuration,
-    stackX, stackY, introRotation, introScale, floatRotation,
-  });
+  const originalTransformRef = useRef<OriginalCardState | null>(null);
+  const hasIntroAnimatedRef = useRef(false); // ✅ FIX: Previene il riavvio dell'intro
 
   const [isExpanded, setIsExpanded] = useState(false);
 
   // =========================================================
-  // STATO ORIGINALE DELLA CARD
+  // ANIMAZIONE FLOATING (Background)
   // =========================================================
-  const originalTransformRef =
-    useRef<OriginalCardState | null>(null);
-
-  // =========================================================
-  // ANIMAZIONE FLOATING
-  // =========================================================
-  const startFloating = () => {
-    if (!cardRef.current) return;
+  const startFloating = useCallback(() => {
+    if (!cardRef.current || isExpanded) return;
     const card = cardRef.current;
-    const p = animPropsRef.current;
+    
     floatTweenRef.current?.kill();
     floatTweenRef.current = gsap.to(card, {
-      y: `-=${p.floatRange}`,
-      rotation: `+=${p.floatRotation}`,
-      duration: p.speed,
+      y: `-=${floatRange}`,
+      rotation: `+=${floatRotation}`,
+      duration: speed,
       repeat: -1,
       yoyo: true,
-      ease: "sine.inOut",
+      ease: "sine.inOut", // La più morbida in assoluto per il floating
     });
-  };
+  }, [floatRange, speed, floatRotation, isExpanded]);
 
   // =========================================================
-  // APERTURA AL CENTRO PERFETTO DEL VIEWPORT
+  // APERTURA AL CENTRO (Zero Sobbalzi)
   // =========================================================
-  const openCard = (e: React.MouseEvent) => {
+  const openCard = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-
     if (!cardRef.current || isExpanded) return;
 
     const card = cardRef.current;
-
-    // Ferma il floating
+    
+    // 1. PULIZIA PRE-ANIMAZIONE
     floatTweenRef.current?.pause();
-
-    // Evita che eventuali animazioni precedenti interferiscano
     gsap.killTweensOf(card);
-
     card.classList.add("is-focused");
 
-    const currentX =
-      Number(gsap.getProperty(card, "x")) || 0;
-
-    const currentY =
-      Number(gsap.getProperty(card, "y")) || 0;
-
     const rect = card.getBoundingClientRect();
+    const computedStyle = window.getComputedStyle(card);
+    
+    // Calcolo dimensioni finali (mantenendo aspect ratio controllato)
+    const finalWidth = Math.min(1100, window.innerWidth * 0.88);
+    const finalHeight = Math.min(800, window.innerHeight * 0.82); 
+    const targetLeft = (window.innerWidth - finalWidth) / 2;
+    const targetTop = (window.innerHeight - finalHeight) / 2;
 
-    const computedStyle =
-      window.getComputedStyle(card);
-
+    // 2. SALVATAGGIO STATO ORIGINALE
     originalTransformRef.current = {
-      x: currentX,
-      y: currentY,
-
-      width: style.width,
-      height: style.height,
-
+      x: Number(gsap.getProperty(card, "x")) || 0,
+      y: Number(gsap.getProperty(card, "y")) || 0,
+      width: style.width || rect.width,
+      height: style.height || rect.height,
       position: computedStyle.position,
       left: computedStyle.left,
       top: computedStyle.top,
       right: computedStyle.right,
       bottom: computedStyle.bottom,
-
       rectLeft: rect.left,
       rectTop: rect.top,
       rectWidth: rect.width,
       rectHeight: rect.height,
     };
 
-    const finalSize = Math.min(
-      1100,
-      window.innerWidth * 0.88,
-      window.innerHeight * 0.82,
-    );
-
-    // PASSIAMO TEMPORANEAMENTE A POSITION FIXED
-    //
-    // In questo modo left/top sono coordinate
-    // direttamente relative al viewport.
-    // =========================================================
-
+    // 3. BLOCCO VISIVO ISTANTANEO (Unico gsap.set per evitare layout thrashing)
+    // Passiamo a fixed MA nelle stesse identiche coordinate visive attuali
     gsap.set(card, {
       position: "fixed",
-
-      left: `${rect.left}px`,
-      top: `${rect.top}px`,
-
+      left: rect.left,
+      top: rect.top,
       right: "auto",
       bottom: "auto",
-
-      width: `${rect.width}px`,
-      height: `${rect.height}px`,
-
+      width: rect.width,
+      height: rect.height,
       x: 0,
       y: 0,
-
       rotation: 0,
       scale: 1,
-
-      transformOrigin: "50% 50%",
-
+      transformOrigin: "center center",
       zIndex: 10001,
     });
 
-    // Attiva lo stato expanded
     setIsExpanded(true);
 
-    // =========================================================
-    // CALCOLO DELLA DIMENSIONE FINALE
-    // =========================================================
-
-    gsap.set(card, {
-      width: `${finalSize}px`,
-      height: `${finalSize}px`,
-    });
-
-    const finalRect =
-      card.getBoundingClientRect();
-
-    // =========================================================
-    // CENTRO ESATTO DELLO SCHERMO
-    // =========================================================
-
-    const targetLeft =
-      (window.innerWidth - finalRect.width) / 2;
-
-    const targetTop =
-      (window.innerHeight - finalRect.height) / 2;
-
-    // Torniamo temporaneamente alla dimensione iniziale
-    gsap.set(card, {
-      width: `${rect.width}px`,
-      height: `${rect.height}px`,
-    });
-
-    // =========================================================
-    // ANIMAZIONE APERTURA
-    // =========================================================
-
+    // 4. ANIMAZIONE DI APERTURA (Più lenta e fluida)
     gsap.to(card, {
       left: targetLeft,
       top: targetTop,
-
-      width: `${finalSize}px`,
-      height: `${finalSize}px`,
-
-      x: 0,
-      y: 0,
-
-      rotation: 0,
-      scale: 1,
-
-      zIndex: 10001,
-
-      boxShadow:
-        "0 50px 120px rgba(0,0,0,0.45)",
-
-      duration: 0.6,
-      ease: "power4.out",
-
-      overwrite: true,
+      width: finalWidth,
+      height: finalHeight,
+      boxShadow: "0 40px 100px rgba(0,0,0,0.35)",
+      duration: 0.8, // Aumentato da 0.6 per fluidità
+      ease: "power3.inOut", // Accelerazione e decelerazione simmetriche ed eleganti
+      overwrite: "auto",
     });
-  };
+  }, [isExpanded, style.width, style.height]);
 
   // =========================================================
-  // CHIUSURA
+  // CHIUSURA (Ritorno perfetto alla posizione originale)
   // =========================================================
   const closeCard = useCallback(() => {
     if (!cardRef.current || !isExpanded) return;
@@ -245,138 +164,92 @@ export const FloatingCard = ({
       return;
     }
 
-    // Ferma eventuali animazioni precedenti
     gsap.killTweensOf(card);
 
-    // =========================================================
-    // LA CARD È ANCORA POSITION: FIXED
-    //
-    // Quindi usiamo le coordinate viewport salvate
-    // prima dell'apertura.
-    // =========================================================
-
+    // 1. ANIMAZIONE DI CHIUSURA
     gsap.to(card, {
       left: original.rectLeft,
       top: original.rectTop,
-
       width: original.rectWidth,
       height: original.rectHeight,
-
       x: 0,
       y: 0,
-
       rotation: 0,
       scale: 1,
-
       zIndex: 30,
-
-      boxShadow:
-        "0 10px 20px rgba(0,0,0,0.1)",
-
-      duration: 0.55,
+      boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
+      duration: 0.7, // Leggermente più lenta per un atterraggio morbido
       ease: "power3.inOut",
-
-      overwrite: true,
-
+      overwrite: "auto",
       onComplete: () => {
-        // =====================================================
-        // RIPRISTINO COMPLETO DELLA POSIZIONE ORIGINALE
-        // =====================================================
-
+        // 2. RIPRISTINO COMPLETO (Istantaneo, ma invisibile perché siamo già nella posizione esatta)
         gsap.set(card, {
           position: original.position,
-
           left: original.left,
           top: original.top,
-
           right: original.right,
           bottom: original.bottom,
-
-          width:
-            original.width !== undefined
-              ? original.width
-              : "auto",
-
-          height:
-            original.height !== undefined
-              ? original.height
-              : "auto",
-
+          width: original.width,
+          height: original.height,
           x: original.x,
           y: original.y,
-
           rotation: 0,
           scale: 1,
-
           zIndex: 30,
-
-          boxShadow:
-            "0 10px 20px rgba(0,0,0,0.1)",
+          boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
         });
 
-        // =====================================================
-        // RIMUOVI STATO FOCUS
-        // =====================================================
-
         card.classList.remove("is-focused");
-
         setIsExpanded(false);
-
-        // =====================================================
-        // RIPARTENZA FLOATING
-        // =====================================================
-
-        startFloating();
-
-        // Pulizia
         originalTransformRef.current = null;
+
+        // 3. RIATTIVAZIONE FLOATING (con requestAnimationFrame per evitare conflitti di frame)
+        requestAnimationFrame(() => {
+          if (cardRef.current) startFloating();
+        });
       },
     });
-  }, [isExpanded]);
+  }, [isExpanded, startFloating]);
 
   // =========================================================
-  // ANIMAZIONE INIZIALE
+  // ANIMAZIONE INIZIALE (Gira SOLO una volta al mount)
   // =========================================================
   useEffect(() => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || hasIntroAnimatedRef.current) return;
+    hasIntroAnimatedRef.current = true;
+    
     const card = cardRef.current;
-    const p = animPropsRef.current;
 
     const ctx = gsap.context(() => {
       requestAnimationFrame(() => {
         if (!card) return;
 
         const rect = card.getBoundingClientRect();
-        const viewportCenterX = window.innerWidth / 2;
-        const viewportCenterY = window.innerHeight / 2;
-        const cardCenterX = rect.left + rect.width / 2;
-        const cardCenterY = rect.top + rect.height / 2;
+        const centerX = (window.innerWidth / 2) - (rect.left + rect.width / 2) + stackX;
+        const centerY = (window.innerHeight / 2) - (rect.top + rect.height / 2) + stackY;
 
-        const centerX = viewportCenterX - cardCenterX + p.stackX;
-        const centerY = viewportCenterY - cardCenterY + p.stackY;
-
+        // Stato iniziale
         gsap.set(card, {
           x: centerX,
           y: centerY,
-          scale: p.introScale,
-          rotation: p.introRotation,
-          opacity: 1,
+          scale: introScale,
+          rotation: introRotation,
+          opacity: 0, // Partiamo da opacità 0 per un fade-in pulito
           transformOrigin: "center center",
         });
 
+        // Animazione di entrata
         gsap.to(card, {
           x: 0,
           y: 0,
           scale: 1,
           rotation: 0,
           opacity: 1,
-          duration: p.introDuration,
-          delay: p.introDelay,
-          ease: "expo.out",
+          duration: introDuration,
+          delay: introDelay,
+          ease: "power3.out", // Più morbido di expo.out
           onComplete: () => {
-            if (!isExpanded) {
-              startFloating();
-            }
+            if (!isExpanded) startFloating();
           },
         });
       });
@@ -386,7 +259,7 @@ export const FloatingCard = ({
       floatTweenRef.current?.kill();
       ctx.revert();
     };
-  }, [isExpanded]);
+  }, []); 
 
   // =========================================================
   // GESTIONE ESC & SCROLL
@@ -394,56 +267,33 @@ export const FloatingCard = ({
   useEffect(() => {
     if (!isExpanded) return;
 
-    const handleEscape = (
-      event: KeyboardEvent
-    ) => {
-      if (event.key === "Escape") {
-        closeCard();
-      }
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeCard();
     };
 
-    document.addEventListener(
-      "keydown",
-      handleEscape
-    );
-
-    const previousOverflow =
-      document.body.style.overflow;
-
+    document.addEventListener("keydown", handleEscape);
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.removeEventListener(
-        "keydown",
-        handleEscape
-      );
-
-      document.body.style.overflow =
-        previousOverflow;
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = previousOverflow;
     };
   }, [isExpanded, closeCard]);
 
   // =========================================================
-  // CLICK CARD
+  // RENDER
   // =========================================================
-  const handleCardClick = (
-    e: React.MouseEvent
-  ) => {
+  const handleCardClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-
     if (!isExpanded) {
       openCard(e);
     }
   };
 
-  // =========================================================
-  // RENDER
-  // =========================================================
   return (
     <>
-      {/* =====================================================
-          OVERLAY
-      ===================================================== */}
+      {/* OVERLAY */}
       {isExpanded && (
         <div
           className="floating-card-overlay"
@@ -452,88 +302,48 @@ export const FloatingCard = ({
             position: "fixed",
             top: 0,
             left: 0,
-
             width: "100vw",
             height: "100vh",
-
-            background:
-              "rgba(0, 0, 0, 0.4)",
-
-            backdropFilter:
-              "blur(4px)",
-
+            background: "rgba(0, 0, 0, 0.4)",
+            backdropFilter: "blur(4px)",
             zIndex: 10000,
           }}
           aria-hidden="true"
         />
       )}
 
-      {/* =====================================================
-          CARD
-      ===================================================== */}
-
+      {/* CARD */}
       <div
         ref={cardRef}
         onClick={handleCardClick}
-        className={`cloud-glass-card p-5 position-absolute ${className} ${
-          isExpanded ? "is-expanded" : ""
-        }`}
+        className={`cloud-glass-card p-5 position-absolute ${className} ${isExpanded ? "is-expanded" : ""}`}
         style={{
-          zIndex: isExpanded
-            ? 10001
-            : 30,
-
-          transformStyle:
-            "preserve-3d",
-
-          willChange:
-            "transform, width, left, top",
-
-          cursor: isExpanded
-            ? "default"
-            : "pointer",
-
-          transition:
-            "border-color 0.3s ease",
-
+          zIndex: isExpanded ? 10001 : 30,
+          transformStyle: "preserve-3d",
+          willChange: "transform, width, height, left, top", // ✅ Hint al browser per rendering fluido
+          cursor: isExpanded ? "default" : "pointer",
           ...style,
         }}
       >
         {children}
 
-        {/* ===================================================
-            CONTENUTO ESPANSO
-        =================================================== */}
-
+        {/* CONTENUTO ESPANSO */}
         {expandedContent && (
           <div
             className={`expansion-details overflow-auto ${
-              isExpanded
-                ? "mt-3 pt-3 border-top opacity-100"
-                : "max-height-0 m-0 p-0"
+              isExpanded ? "mt-3 pt-3 border-top opacity-100" : "max-height-0 m-0 p-0"
             }`}
             style={{
-              maxHeight: isExpanded
-                ? "calc(70vh - 80px)"
-                : "0px",
-
-              transition:
-                "max-height 0.4s ease, opacity 0.3s ease",
-
-              pointerEvents:
-                isExpanded
-                  ? "auto"
-                  : "none",
+              maxHeight: isExpanded ? "calc(70vh - 80px)" : "0px",
+              transition: "max-height 0.4s ease, opacity 0.3s ease",
+              pointerEvents: isExpanded ? "auto" : "none",
             }}
           >
             {expandedContent}
           </div>
         )}
 
-        {/* ===================================================
-            CLOSE BUTTON
-        =================================================== */}
-
+        {/* CLOSE BUTTON */}
         {isExpanded && (
           <button
             type="button"
@@ -544,34 +354,22 @@ export const FloatingCard = ({
             aria-label="Chiudi"
             style={{
               position: "absolute",
-
               top: "12px",
               right: "12px",
-
               width: "36px",
               height: "36px",
-
               border: "none",
               borderRadius: "50%",
-
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-
-              background:
-                "rgba(255,255,255,0.9)",
-
+              background: "rgba(255,255,255,0.9)",
               color: "#111",
-
               fontSize: "20px",
               lineHeight: 1,
-
               cursor: "pointer",
-
               zIndex: 20,
-
-              boxShadow:
-                "0 4px 12px rgba(0,0,0,0.15)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
             }}
           >
             ×

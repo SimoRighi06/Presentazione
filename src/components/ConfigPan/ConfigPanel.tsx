@@ -89,16 +89,24 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
 
   // --- GESTIONE FILE PDF LOCALE (DRAG & DROP) ---
   const handleFileSelect = (file: File) => {
-    if (file && file.type === "application/pdf") {
-      const objectUrl = URL.createObjectURL(file);
-      setUploadedFileName(file.name);
-      setConfig((prev) => ({ ...prev, presentationUrl: objectUrl }));
-    } else {
-      alert("Deve essere PDF.");
+    if (file.type !== "application/pdf") {
+      alert("Per favore, seleziona solo file PDF.");
+      return;
     }
+
+    // Creiamo un URL temporaneo in RAM (blob:)
+    const objectUrl = URL.createObjectURL(file);
+    
+    setConfig((prev) => ({
+      ...prev,
+      presentationUrl: objectUrl, // Salviamo il blob in memoria
+      hasPresentation: true,
+    }));
+    setUploadedFileName(file.name);
+    setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
@@ -455,7 +463,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               <input
                 type="file"
                 id="pdf-file-input"
-                accept="application/pdf"
+                accept="/pdf"
                 className="d-none"
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {

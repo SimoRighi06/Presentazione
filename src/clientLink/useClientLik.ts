@@ -19,7 +19,6 @@ export const useClientView = (
 
         if(slug){
             console.log('Modalità cliente attiva: ${slug}');
-
             setSiteParam(slug);
             setViewMode("draft");
             setIsConfigMode(false);

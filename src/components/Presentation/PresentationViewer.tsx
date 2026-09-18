@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2} from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
+import { Instagram, Linkedin } from 'react-bootstrap-icons';
 
 import tpLogo from "../../assets/logo-tp-black.svg";
 
@@ -24,7 +25,6 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
   presentationUrl,
   navItems,
   onStartDraft,
-  onOpenAdmin,
 }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -61,12 +61,12 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
 
   const prevPage = useCallback(
     () => setPageNumber((prev) => Math.max(prev - 1, 1)),
-    []
+    [],
   );
-  
+
   const nextPage = useCallback(
     () => setPageNumber((prev) => Math.min(prev + 1, numPages || 1)),
-    [numPages]
+    [numPages],
   );
 
   useEffect(() => {
@@ -165,22 +165,30 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
               <span className="text-white">Conosciamoci</span>
             </a>
 
-            <a href="https://www.instagram.com/tecnoprogress/">
-              <i className="bi bi-instagram text-black fs-4 me-2"></i>
+            <a
+              href="https://www.instagram.com/tecnoprogress/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Instagram color="black" size={24} />
             </a>
 
-            <a href="https://it.linkedin.com/company/tecnoprogress">
-              <i className="bi bi-linkedin text-black fs-4"></i>
+            <a
+              href="https://it.linkedin.com/company/tecnoprogress"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Linkedin color="black" size={24} />
             </a>
           </div>
 
-          <button
+          {/* <button
             onClick={onOpenAdmin}
             className="btn btn-sm rounded-pill px-2 py-2 shadow-sm fw-semibold"
             aria-label="Apri pannello di configurazione"
           >
             ⚙️
-          </button>
+          </button> */}
         </div>
       </header>
 

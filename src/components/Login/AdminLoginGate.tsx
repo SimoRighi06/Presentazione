@@ -17,12 +17,12 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
 
-  // ✅ RATE LIMITING: Stati per il blocco dopo 3 tentativi
+  // RATE LIMITING: Stati per il blocco dopo 3 tentativi
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
 
-  // ✅ FIX PUNTO 5: Se l'utente è già autenticato, entra direttamente
+  // FIX PUNTO 5: Se l'utente è già autenticato, entra direttamente
   useEffect(() => {
     const isAuthenticated = sessionStorage.getItem("admin_authenticated");
     if (isAuthenticated === "true") {
@@ -30,7 +30,7 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
     }
   }, [onSuccess]);
 
-  // ✅ Timer per il conto alla rovescia del blocco
+  // Timer per il conto alla rovescia del blocco
   useEffect(() => {
     if (!lockoutUntil) return;
 
@@ -59,12 +59,12 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
     e.preventDefault();
     setError("");
 
-    // ✅ FIX PUNTO 3: Se siamo bloccati, non fare nulla
+    // FIX PUNTO 3: Se siamo bloccati, non fare nulla
     if (timeLeft > 0) {
       return;
     }
 
-    // ✅ FIX PUNTO 2: Codifica l'input in Base64 e confronta (no password in chiaro)
+    // FIX PUNTO 2: Codifica l'input in Base64 e confronta (no password in chiaro)
     const inputBase64 = btoa(password);
 
     if (inputBase64 === PASSWORD_BASE64) {
@@ -77,7 +77,7 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
       setFailedAttempts(newAttempts);
 
       if (newAttempts >= 4) {
-        // ✅ FIX PUNTO 3: Blocco per 60 secondi
+        // FIX PUNTO 3: Blocco per 60 secondi
         // Date.now() qui è OK perché siamo dentro un gestore di eventi (handleSubmit)
         const lockTime = Date.now() + 30000;
         setLockoutUntil(lockTime);

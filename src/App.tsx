@@ -25,7 +25,7 @@ export default function App() {
     setSiteParam,
   } = useAppRouter();
 
-  useClientView(setSiteParam, setViewMode, setIsConfigMode)
+  useClientView(setSiteParam, setViewMode, setIsConfigMode);
   const [activePage] = useState("1");
   const [draftUrl, setDraftUrl] = useState("bozza01");
   const isInteractive = true;
@@ -65,14 +65,14 @@ export default function App() {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isClientView()) return;
-        if (
-          (e.ctrlKey && e.shiftKey && e.code === "KeyC") ||
-          (e.altKey &&
-            (e.code === "KeyC" || e.key.toLowerCase() === "c" || e.key === "ç"))
-        ) {
-          e.preventDefault();
-          setShowAdminLogin(true);
-        }
+      if (
+        (e.ctrlKey && e.shiftKey && e.code === "KeyC") ||
+        (e.altKey &&
+          (e.code === "KeyC" || e.key.toLowerCase() === "c" || e.key === "ç"))
+      ) {
+        e.preventDefault();
+        setShowAdminLogin(true);
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -90,8 +90,7 @@ export default function App() {
     } else {
       setIsImageLoading(false); 
     }
-  }, [draftUrl, siteParam, isImage]); */  
-
+  }, [draftUrl, siteParam, isImage]); */
 
   // =========================================================
   // 🚀 PREFETCHING INTELLIGENTE (Elimina il delay al click)
@@ -572,8 +571,7 @@ export default function App() {
                 loading="eager"
               />
             )}
-          </div> 
-          
+          </div>
         </div>
 
         <FooterHUD
@@ -583,7 +581,11 @@ export default function App() {
             setActiveTab(item.id);
             if (item.draftUrl) handleUrlChange(item.draftUrl);
           }}
-          onOpenPresentation={() => setViewMode("presentation")}
+          onOpenPresentation={
+            config.presentationUrl
+              ? () => setViewMode("presentation")
+              : undefined
+          }
         />
       </main>
     </div>
