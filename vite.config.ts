@@ -71,6 +71,11 @@ export default defineConfig({
   },
 });
 
+/*  _REDIRECTS !!!!!
+/bozze-proxy/:site/*  http://:site.bozzasito.com/bozze/:splat  200!
+
+*/
+
 
 /* 
 import { defineConfig } from 'vite';
