@@ -1,0 +1,1 @@
+/bozze-proxy/:site/*  http://:site.bozzasito.com/bozze/:splat  200!
