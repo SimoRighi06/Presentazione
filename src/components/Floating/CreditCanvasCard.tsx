@@ -34,12 +34,12 @@ export const CreditsPopupCard: React.FC<CreditsPopupCardProps> = ({
   return (
     <div
       className="position-fixed"
-      style={{ bottom: "2.5%", left: "2.5%", zIndex: 9999 }}
+      style={{ bottom: "2%", left: "1.5%", zIndex: 9999 }}
     >
       {isOpen && (
         <div
           ref={cardRef}
-          className="cloud-glass-card p-4 shadow-lg mb-3"
+          className="cloud-glass-card p-4 shadow-lg mb-5 mb-md-3"
           style={{
             width: "420px",
             background: "rgba(255, 255, 255, 0.92)",
@@ -53,7 +53,7 @@ export const CreditsPopupCard: React.FC<CreditsPopupCardProps> = ({
               className="m-0 fw-bold d-flex align-items-center gap-2"
               style={{ fontSize: "1rem" }}
             >
-              <Code size={20} className="arancione" />
+              <Code size={18} className="arancione" />
               Credits Team
             </h6>
             <button

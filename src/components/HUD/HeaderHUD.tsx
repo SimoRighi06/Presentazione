@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import tpLogo from "../../assets/logo-tp-black.svg";
-import { Instagram, Linkedin } from 'react-bootstrap-icons';
+import { Instagram, Linkedin } from "react-bootstrap-icons";
 
 interface HeaderHUDProps {
   currentUrl: string;
@@ -24,10 +24,6 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
 
   // ✅ 2. Stato locale per l'input, sincronizzato in modo sicuro tramite useEffect
   const [inputValue, setInputValue] = useState(currentUrl);
-
-  /* useEffect(() => {
-    setInputValue(currentUrl);
-  }, [currentUrl]); */
 
   // ✅ 3. Event listener per la scorciatoia da tastiera
   useEffect(() => {
@@ -63,32 +59,45 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
   };
 
   return (
-    <header className="fixed-top w-100 p-4 d-flex justify-content-between align-items-center z-3 pointer-events-auto">
-      {/* LOGO BRAND (A SINISTRA) */}
-      <div className="d-flex align-items-center">
+    <header className="fixed-top w-100 p-2 p-md-4 d-flex justify-content-between align-items-center z-3 pointer-events-auto">
+      {/* 1. LOGO BRAND (A SINISTRA) */}
+      <div className="d-flex align-items-center flex-shrink-0">
+        <img
+          src={tpLogo} // Sostituisci con brandLogoUrl se preferisci
+          alt="Logo Tecnoprogress"
+          style={{ height: "22px", objectFit: "contain" }} // 28px su mobile, più compatto
+          className="d-sm-none" // Nascondi su schermi >= 576px
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
         <img
           src={tpLogo}
-          alt="Tecnoprogress"
-          style={{ height: "32px", objectFit: "contain" }}
+          alt="Logo Tecnoprogress"
+          style={{ height: "32px", objectFit: "contain" }} // 32px su desktop
+          className="d-none d-sm-block" // Mostra solo su schermi >= 576px
           loading="eager"
           decoding="async"
           fetchPriority="high"
         />
       </div>
 
-      {/* TITOLO DOMINIO (AL CENTRO) */}
-      <div className="position-absolute top-50 start-50 translate-middle text-center">
-        <h1 className="m-0 fs-4 fw-normal text-dark">
+      {/* 2. TITOLO DOMINIO (AL CENTRO) */}
+      <div className="d-none d-sm-block position-absolute top-50 start-50 translate-middle text-center px-2">
+        <h1
+          className="m-0 fs-6 fs-md-4 fw-normal text-dark text-truncate"
+          style={{ maxWidth: "300px", whiteSpace: "nowrap" }}
+        >
           <strong>{dominio}</strong>
         </h1>
       </div>
 
-      {/* DESTRA: SEARCHBAR (ADMIN) O CONTATTI GLASS (CLIENTE) */}
+      {/* 3. DESTRA: SEARCHBAR (ADMIN) O CONTATTI GLASS (CLIENTE) */}
       {isAdminMode ? (
         <form
           onSubmit={handleSubmit}
-          className="position-relative"
-          style={{ width: "320px" }}
+          className="position-relative flex-shrink-0"
+          style={{ width: "100%", maxWidth: "280px" }} // maxWidth invece di width fissa per mobile
         >
           <input
             type="text"
@@ -96,7 +105,11 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="bozza01 o URL..."
             className="btn btn-cloud w-100 ps-4 pe-5 text-start"
-            style={{ borderRadius: "50px", outline: "none" }}
+            style={{
+              borderRadius: "50px",
+              outline: "none",
+              fontSize: "0.9rem",
+            }}
             autoFocus
           />
           <div className="position-absolute end-0 top-50 translate-middle-y me-3 d-flex align-items-center gap-2">
@@ -117,38 +130,48 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
             <button
               type="submit"
               className="border-0 bg-transparent p-0 text-muted d-flex align-items-center"
-              aria-label="Cerca"
+              aria-label="Cerca bozza"
             >
               <Search size={16} style={{ cursor: "pointer" }} />
             </button>
           </div>
         </form>
       ) : (
-        <div className="d-flex align-items-center gap-2">
+        <div className="d-flex align-items-center gap-1 gap-md-3 flex-shrink-0">
           <a
             href="https://www.tecnoprogress.net/"
-            className="btn btn-cloud-black d-flex align-items-center gap-2 px-4 py-2"
-            style={{ borderRadius: "50px", fontSize: "14px" }}
+            className="btn btn-cloud-black d-flex align-items-center gap-2 px-2 px-md-4 py-1 py-md-2"
+            style={{ borderRadius: "50px", fontSize: "13px" }}
             target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visita il sito Tecnoprogress" 
           >
-            <span className="text-white">Conosciamoci</span>
+            <span className=" text-white">Conosciamoci</span>
+
+            {/* Versione compatta per mobile */}
           </a>
 
-          <a href="https://www.instagram.com/tecnoprogress/" target="_blank" rel="noopener noreferrer">
-            <Instagram color="black" size={24}/>
+          <a
+            href="https://www.instagram.com/tecnoprogress/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Profilo Instagram Tecnoprogress" 
+          >
+            <Instagram color="black" size={20} className="d-sm-none" />
+            <Instagram color="black" size={24} className="d-none d-sm-block" />
           </a>
 
           <a
             href="https://it.linkedin.com/company/tecnoprogress"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Profilo LinkedIn Tecnoprogress" 
           >
-            <Linkedin color="black" size={24} />
+            <Linkedin color="black" size={20} className="d-sm-none" />
+            <Linkedin color="black" size={24} className="d-none d-sm-block" />
           </a>
         </div>
       )}
     </header>
   );
 };
-
-

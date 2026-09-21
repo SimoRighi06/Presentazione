@@ -384,113 +384,125 @@ export default function App() {
       />
 
       <main className="d-flex flex-column align-items-center justify-content-center w-100 h-100 position-relative z-1">
-        {/* CARD 01 — FONT (Animazione Premium Lenta) */}
-        <FloatingCard
-          style={{ top: "40%", right: "5%", width: "330px" }}
-          introDelay={0.25}
-          introDuration={1.6}
-          stackX={-4}
-          stackY={-4}
-          introRotation={-1.5}
-          introScale={0.96}
-          floatRange={8}
-          speed={6.5}
-          floatRotation={0.6}
+        <div
+          className=""
+          style={{
+            maxWidth: "1920px",
+          }}
         >
-          <div
-            className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2"
-            style={{ fontSize: "inherit" }}
+          {/* CARD 01 — FONT (Animazione Premium Lenta) */}
+          <FloatingCard
+            style={{ top: "40%", right: "5%", width: "330px" }}
+            introDelay={0.25}
+            introDuration={1.6}
+            stackX={-4}
+            stackY={-4}
+            introRotation={-1.5}
+            introScale={0.96}
+            floatRange={8}
+            speed={6.5}
+            floatRotation={0.6}
           >
-            <Type size={16} />
-            Font Utilizzati
-          </div>
-          <ul className="list-unstyled mb-0 ms-1 d-flex text-start ps-4 flex-column gap-2 mt-3">
-            {config.fonts?.map((font, index) => (
-              <li
-                key={font}
-                className={
-                  index === 0
-                    ? "fw-bold text-dark mt-2 fs-4"
-                    : "text-muted mt-2 fs-4"
-                }
-              >
-                • {font}
-              </li>
-            ))}
-          </ul>
-          {config.customDescriptionPalette && (
-            <div className="mt-4">
-              <p
-                className="mb-0 text-black text-start fs-6 border-top pt-3 text-break mt-3"
-                style={{
-                  whiteSpace: "pre-line",
-                  wordBreak: "break-word",
-                  overflowWrap: "anywhere",
-                }}
-              >
-                {config.customDescriptionPalette}
-              </p>
+            <div
+              className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2"
+              style={{ fontSize: "inherit" }}
+            >
+              <Type size={16} />
+              Font Utilizzati
             </div>
-          )}
-        </FloatingCard>
+            <ul className="list-unstyled mb-0 ms-1 d-flex text-start ps-4 flex-column gap-2 mt-3">
+              {config.fonts?.map((font, index) => (
+                <li
+                  key={font}
+                  className={
+                    index === 0
+                      ? "fw-bold text-dark mt-2 fs-4"
+                      : "text-muted mt-2 fs-4"
+                  }
+                >
+                  • {font}
+                </li>
+              ))}
+            </ul>
+            {config.customDescriptionPalette && (
+              <div className="mt-4">
+                <p
+                  className="mb-0 text-black text-start fs-6 border-top pt-3 text-break mt-3"
+                  style={{
+                    whiteSpace: "pre-line",
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {config.customDescriptionPalette}
+                </p>
+              </div>
+            )}
+          </FloatingCard>
+
+          {/* CARD 03 — PALETTE (Animazione Premium Lenta) */}
+          <FloatingCard
+            style={{ top: "18%", left: "2.5%", width: "300px" }}
+            introDelay={0.15}
+            introDuration={1.6}
+            stackX={2}
+            stackY={2}
+            introRotation={1}
+            introScale={1.04}
+            floatRange={8}
+            speed={6.5}
+            floatRotation={0.5}
+          >
+            <div
+              className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2"
+              style={{ fontSize: "0.85rem" }}
+            >
+              <Palette size={16} />
+              Palette Colori
+            </div>
+            <div className="d-flex flex-column gap-2 ms-1">
+              {config.colors?.map((hex, index) => (
+                <div
+                  key={index}
+                  className="d-flex align-items-center justify-content-around mt-3"
+                >
+                  <span className="font-monospace fs-4 fw-semibold text-uppercase">
+                    {hex}
+                  </span>
+                  <div
+                    className="color-swatch-rect"
+                    style={{ backgroundColor: hex }}
+                  />
+                </div>
+              ))}
+            </div>
+          </FloatingCard>
+
+          {/* CUSTOM CARD */}
+          <IndependentCustomCard
+            config={config}
+            style={{
+              bottom: "8%",
+              left: "5%",
+              width: "280px",
+              height: "140px",
+            }}
+            introDelay={0.15}
+            introDuration={1.2}
+            stackX={4}
+            stackY={-2}
+            introRotation={-2}
+            introScale={0.98}
+            floatRange={12}
+            speed={4.2}
+            floatRotation={1.2}
+          />
+        </div>
 
         {/* CARD 02 — CREDITS */}
         <CreditsPopupCard azienda1="Tecnoprogress" />
 
-        {/* CARD 03 — PALETTE (Animazione Premium Lenta) */}
-        <FloatingCard
-          style={{ top: "18%", left: "2.5%", width: "300px" }}
-          introDelay={0.15}
-          introDuration={1.6}
-          stackX={2}
-          stackY={2}
-          introRotation={1}
-          introScale={1.04}
-          floatRange={8}
-          speed={6.5}
-          floatRotation={0.5}
-        >
-          <div
-            className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2"
-            style={{ fontSize: "0.85rem" }}
-          >
-            <Palette size={16} />
-            Palette Colori
-          </div>
-          <div className="d-flex flex-column gap-2 ms-1">
-            {config.colors?.map((hex, index) => (
-              <div
-                key={index}
-                className="d-flex align-items-center justify-content-around mt-3"
-              >
-                <span className="font-monospace fs-4 fw-semibold text-uppercase">
-                  {hex}
-                </span>
-                <div
-                  className="color-swatch-rect"
-                  style={{ backgroundColor: hex }}
-                />
-              </div>
-            ))}
-          </div>
-        </FloatingCard>
-
         <InfoPopupCard dominio={config.dominio || `${siteParam}.com`} />
-
-        {/* CUSTOM CARD */}
-        <IndependentCustomCard
-          config={config}
-          style={{ bottom: "8%", left: "5%", width: "280px", height: "140px" }}
-          introDelay={0.15}
-          introDuration={1.2}
-          stackX={4}
-          stackY={-2}
-          introRotation={-2}
-          introScale={0.98}
-          floatRange={12}
-          speed={4.2}
-          floatRotation={1.2}
-        />
 
         {/* CENTRAL WEBSITE PREVIEW */}
         <div

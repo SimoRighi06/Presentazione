@@ -32,17 +32,19 @@ export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
 
   return (
     <div
-      className="position-fixed"
-      style={{ bottom: "2.5%", right: "2.5%", zIndex: 9999 }}
+      className="position-fixed d-flex flex-column align-items-end"
+      style={{ bottom: "2%", right: "1.5%", zIndex: 9999 }}
     >
       {isOpen && (
         <div
           ref={cardRef}
-          className="cloud-glass-card p-4 shadow-lg mb-3"
+          className="cloud-glass-card p-3 p-md-4 shadow-lg mb-3"
           style={{
-            width: "460px",
+            width: "calc(100vw - 2rem)", 
+            maxWidth: "460px",           
             background: "rgba(255, 255, 255, 0.92)",
             backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
             borderRadius: "20px",
             border: "1px solid rgba(255,255,255,0.4)",
             fontFamily: "'Gilroy', sans-serif",
@@ -50,12 +52,14 @@ export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
         >
           <div className="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
             <h6 className="m-0 fw-bold d-flex align-items-center gap-2" style={{ fontSize: "1rem" }}>
-              <ShieldCheck size={20} className="arancione" />
+              <ShieldCheck size={18} className="arancione" />
               Info Progetto & Crediti
             </h6>
             <button
               onClick={() => setIsOpen(false)}
               className="btn btn-sm btn-light rounded-circle p-1 d-flex align-items-center justify-content-center"
+              aria-label="Chiudi informazioni"
+              style={{ width: "32px", height: "32px" }}
             >
               <X size={16} />
             </button>
@@ -66,7 +70,7 @@ export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
             style={{ fontSize: "0.9rem", lineHeight: "1.5" }}
           >
             <div className="p-2 rounded bg-light bg-opacity-75 border border-light-subtle">
-              <p className="m-0 fw-semibold text-dark">
+              <p className="m-0 fw-semibold text-dark text-break">
                 Il copyright della proposta grafica{" "}
                 <span className="arancione">{dominio}</span> è di
                 Tecnoprogress.
@@ -110,9 +114,11 @@ export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
 
               <div className="d-flex align-items-center gap-2">
                 <Phone size={12} className="shrink-0" />
+                {/* ✅ FIX ACCESSIBILITÀ (Lighthouse 100/100) */}
                 <a
                   href="tel:0464570720"
                   className="text-decoration-none text-muted"
+                  aria-label="Chiama il numero 0464570720"
                 >
                   Tel. 0464570720
                 </a>
@@ -120,9 +126,11 @@ export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
 
               <div className="d-flex align-items-center gap-2">
                 <Mail size={12} className="shrink-0" />
+                {/* ✅ FIX ACCESSIBILITÀ (Lighthouse 100/100) */}
                 <a
                   href="mailto:modifiche@tecnoprogress.net"
-                  className="text-decoration-none text-muted"
+                  className="text-decoration-none text-muted text-break"
+                  aria-label="Invia una email a modifiche@tecnoprogress.net"
                 >
                   modifiche@tecnoprogress.net
                 </a>
@@ -142,28 +150,28 @@ export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="btn rounded-circle d-flex align-items-center justify-content-center"
+          className="btn rounded-circle d-flex align-items-center justify-content-center shadow-lg"
+          aria-label="Apri informazioni e crediti"
           style={{
-            width: "48px",
-            height: "48px",
-            background: "rgba(255, 255, 255, 0.15)",
+            width: "52px", // Leggermente più grande per touch target ottimale (min 48px)
+            height: "52px",
+            background: "rgba(255, 255, 255, 0.85)",
             backdropFilter: "blur(12px)",
             WebkitBackdropFilter: "blur(12px)",
-            border: "1px solid rgba(255, 255, 255, 0.25)",
-            boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.2)",
+            border: "1px solid rgba(255, 255, 255, 0.5)",
+            boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.15)",
             transition: "all 0.2s ease",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "scale(1.1)";
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.25)";
+            e.currentTarget.style.background = "rgba(255, 255, 255, 1)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.15)";
+            e.currentTarget.style.background = "rgba(255, 255, 255, 0.85)";
           }}
-          title="Crediti del Team"
         >
-          <Info size={22} className="arancione" />
+          <Info size={24} className="arancione" />
         </button>
       )}
     </div>

@@ -16,8 +16,8 @@ export const FooterHUD: React.FC<FooterHUDProps> = ({
   onOpenPresentation,
 }) => {
   return (
-    <footer className="position-fixed bottom-0 start-50 translate-middle-x mb-4 z-3">
-      <nav className="cloud-glass-card d-flex align-items-center gap-2 p-2 rounded-pill shadow">
+    <footer className="position-fixed bottom-0 start-50 translate-middle-x mb-3 mb-md-4 z-3">
+      <nav className="cloud-glass-card d-flex align-items-center gap-2 p-1 px-2 p-md-2 rounded-pill shadow">
         
         {/* Tasto rapido per tornare alla Presentazione PDF */}
         {onOpenPresentation && (
@@ -27,7 +27,7 @@ export const FooterHUD: React.FC<FooterHUDProps> = ({
             className="btn btn-sm btn-dark rounded-pill px-3 py-2 d-flex align-items-center gap-2 shadow-sm fw-semibold"
             title="Torna alla Presentazione"
           >
-            <Presentation size={16} />
+            <Presentation size={18} />
             <span className="d-none d-sm-inline">Presentazione</span>
           </button>
         )}
@@ -46,7 +46,7 @@ export const FooterHUD: React.FC<FooterHUDProps> = ({
               key={item.id}
               type="button"
               onClick={() => onSelectTab?.(item)}
-              className={`btn btn-sm rounded-pill px-3 py-2 transition-all ${
+              className={`btn btn-sm rounded-pill px-md-3 py-2 transition-all  ${
                 isActive
                   ? "btn-dark-glass shadow-sm fw-bold"
                   : "btn-light text-dark bg-transparent border-0 opacity-75"

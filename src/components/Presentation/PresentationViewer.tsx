@@ -140,60 +140,7 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
 
   return (
     <div className="cloud-viewport">
-      {/* HEADER PERSONALIZZATO PRESENTAZIONE */}
-      <header className="position-absolute top-0 start-0 w-100 p-4 z-3 d-flex justify-content-between align-items-center">
-        <div className="ms-md-3 d-flex align-items-center">
-          <span className="fw-bold text-dark fs-5 tracking-tight">
-            <img
-              src={tpLogo}
-              alt="Tecnoprogress"
-              style={{ height: "32px", objectFit: "contain" }}
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-            />
-          </span>
-        </div>
-
-        <div className="me-md-3 d-flex align-items-center gap-3">
-          <div className="d-flex align-items-center gap-2">
-            <a
-              href="https://www.tecnoprogress.net/"
-              className="btn btn-cloud-black d-flex align-items-center gap-2 px-4 py-2"
-              style={{ borderRadius: "50px", fontSize: "14px" }}
-            >
-              <span className="text-white">Conosciamoci</span>
-            </a>
-
-            <a
-              href="https://www.instagram.com/tecnoprogress/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Instagram color="black" size={24} />
-            </a>
-
-            <a
-              href="https://it.linkedin.com/company/tecnoprogress"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Linkedin color="black" size={24} />
-            </a>
-          </div>
-
-          {/* <button
-            onClick={onOpenAdmin}
-            className="btn btn-sm rounded-pill px-2 py-2 shadow-sm fw-semibold"
-            aria-label="Apri pannello di configurazione"
-          >
-            ⚙️
-          </button> */}
-        </div>
-      </header>
-
       <div className="cloud-bg-canvas" />
-
       <main className="d-flex flex-column align-items-center justify-content-center w-100 h-100 position-relative z-1 p-4 pt-5">
         <div
           className="center-stage-container cloud-glass-card p-0 shadow-lg overflow-hidden position-relative mb-4 d-flex align-items-center justify-content-center bg-white mt-4"
