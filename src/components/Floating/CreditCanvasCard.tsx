@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Code, X, User, Palette, Building, Briefcase } from "lucide-react";
 import gsap from "gsap";
+import "./CreditInfoCard.css"
 
 interface CreditsPopupCardProps {
   azienda1?: string;
@@ -20,45 +21,51 @@ export const CreditsPopupCard: React.FC<CreditsPopupCardProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Animazione GSAP per l'apertura dal basso a sinistra
+  // Animazione GSAP per l'apertura
   useEffect(() => {
     if (isOpen && cardRef.current) {
+      // Kill eventuali animazioni precedenti per evitare conflitti
+      gsap.killTweensOf(cardRef.current);
+      
       gsap.fromTo(
         cardRef.current,
-        { scale: 0.8, opacity: 0, y: 40, transformOrigin: "bottom left" },
-        { scale: 1, opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.2)" },
+        { 
+          scale: 0.9, 
+          opacity: 0, 
+          y: 30, 
+          transformOrigin: "bottom left" 
+        },
+        { 
+          scale: 1, 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.4, 
+          ease: "back.out(1.2)" 
+        },
       );
     }
   }, [isOpen]);
 
   return (
-    <div
-      className="position-fixed"
-      style={{ bottom: "2%", left: "1.5%", zIndex: 9999 }}
-    >
+    <div className="credits-popup-wrapper position-fixed">
       {isOpen && (
         <div
           ref={cardRef}
-          className="cloud-glass-card p-4 shadow-lg mb-5 mb-md-3"
-          style={{
-            width: "420px",
-            background: "rgba(255, 255, 255, 0.92)",
-            backdropFilter: "blur(20px)",
-            borderRadius: "20px",
-            border: "1px solid rgba(255,255,255,0.4)",
-          }}
+          className="cloud-glass-card p-3 p-md-4 shadow-lg mb-3 credits-popup-card"
         >
           <div className="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
             <h6
               className="m-0 fw-bold d-flex align-items-center gap-2"
               style={{ fontSize: "1rem" }}
             >
-              <Code size={18} className="arancione" />
+              <Code size={16} className="arancione" />
               Credits Team
             </h6>
             <button
               onClick={() => setIsOpen(false)}
               className="btn btn-sm btn-light rounded-circle p-1 d-flex align-items-center justify-content-center"
+              aria-label="Chiudi crediti"
+              style={{ width: "32px", height: "32px" }}
             >
               <X size={16} />
             </button>
@@ -67,20 +74,17 @@ export const CreditsPopupCard: React.FC<CreditsPopupCardProps> = ({
           {/* LISTA CREDITI TEAM */}
           <div
             className="d-flex flex-column gap-3 font-monospace"
-            style={{ fontSize: "0.95rem" }}
+            style={{ fontSize: "0.9rem" }}
           >
-            {/* AZIENDE (Stampa se almeno una è presente, gestendo dinamicamente la "&" o il singolo valore) */}
+            {/* AZIENDE */}
             {(azienda1 || azienda2) && (
               <div className="d-flex align-items-start gap-2">
                 <Building size={20} className="arancione mt-1 shrink-0" />
                 <div>
-                  <span
-                    className="text-muted d-block"
-                    style={{ fontSize: "0.82rem" }}
-                  >
+                  <span className="text-muted d-block" style={{ fontSize: "0.82rem" }}>
                     Partner
                   </span>
-                  <span className="fw-semibold text-dark">
+                  <span className="fw-semibold text-dark text-break">
                     {azienda1 && azienda2 ? `${azienda1} & ${azienda2}` : azienda1 || azienda2}
                   </span>
                 </div>
@@ -92,13 +96,10 @@ export const CreditsPopupCard: React.FC<CreditsPopupCardProps> = ({
               <div className="d-flex align-items-start gap-2 pt-2 border-top">
                 <Palette size={20} className="arancione mt-1 shrink-0" />
                 <div>
-                  <span
-                    className="text-muted d-block"
-                    style={{ fontSize: "0.82rem" }}
-                  >
+                  <span className="text-muted d-block" style={{ fontSize: "0.82rem" }}>
                     UI/UX Design
                   </span>
-                  <span className="fw-semibold text-dark">{designer}</span>
+                  <span className="fw-semibold text-dark text-break">{designer}</span>
                 </div>
               </div>
             )}
@@ -108,13 +109,10 @@ export const CreditsPopupCard: React.FC<CreditsPopupCardProps> = ({
               <div className="d-flex align-items-start gap-2 pt-2 border-top">
                 <Briefcase size={20} className="arancione mt-1 shrink-0" />
                 <div>
-                  <span
-                    className="text-muted d-block"
-                    style={{ fontSize: "0.82rem" }}
-                  >
+                  <span className="text-muted d-block" style={{ fontSize: "0.82rem" }}>
                     Consulenza Commerciale
                   </span>
-                  <span className="fw-semibold text-dark">{consulente}</span>
+                  <span className="fw-semibold text-dark text-break">{consulente}</span>
                 </div>
               </div>
             )}
@@ -124,13 +122,10 @@ export const CreditsPopupCard: React.FC<CreditsPopupCardProps> = ({
               <div className="d-flex align-items-start gap-2 pt-2 border-top">
                 <User size={20} className="arancione mt-1 shrink-0" />
                 <div>
-                  <span
-                    className="text-muted d-block"
-                    style={{ fontSize: "0.82rem" }}
-                  >
+                  <span className="text-muted d-block" style={{ fontSize: "0.82rem" }}>
                     Development & Motion
                   </span>
-                  <span className="fw-semibold text-dark">{developer}</span>
+                  <span className="fw-semibold text-dark text-break">{developer}</span>
                 </div>
               </div>
             )}
@@ -142,28 +137,11 @@ export const CreditsPopupCard: React.FC<CreditsPopupCardProps> = ({
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="btn rounded-circle d-flex align-items-center justify-content-center"
-          style={{
-            width: "48px",
-            height: "48px",
-            background: "rgba(255, 255, 255, 0.15)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            border: "1px solid rgba(255, 255, 255, 0.25)",
-            boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.2)",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "scale(1.1)";
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.25)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.15)";
-          }}
+          className="credits-popup-btn rounded-circle d-flex align-items-center justify-content-center"
+          aria-label="Apri crediti del team"
           title="Crediti del Team"
         >
-          <Code size={30} className="arancione" />
+          <Code size={15} className="arancione" />
         </button>
       )}
     </div>
