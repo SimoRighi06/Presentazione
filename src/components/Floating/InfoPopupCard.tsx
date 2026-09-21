@@ -153,8 +153,8 @@ export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
           className="btn rounded-circle d-flex align-items-center justify-content-center shadow-lg"
           aria-label="Apri informazioni e crediti"
           style={{
-            width: "52px", // Leggermente più grande per touch target ottimale (min 48px)
-            height: "52px",
+            width: "45px", 
+            height: "45px",
             background: "rgba(255, 255, 255, 0.85)",
             backdropFilter: "blur(12px)",
             WebkitBackdropFilter: "blur(12px)",
@@ -171,7 +171,7 @@ export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
             e.currentTarget.style.background = "rgba(255, 255, 255, 0.85)";
           }}
         >
-          <Info size={24} className="arancione" />
+          <Info size={18} className="arancione" />
         </button>
       )}
     </div>

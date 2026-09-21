@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ArrowLeft, ArrowRight, Loader2} from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { Instagram, Linkedin } from 'react-bootstrap-icons';
-
-import tpLogo from "../../assets/logo-tp-black.svg";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
