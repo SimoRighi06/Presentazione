@@ -64,7 +64,7 @@ export const FloatingCard = ({
   const startFloating = useCallback(() => {
     if (!cardRef.current || isExpanded) return;
     const card = cardRef.current;
-    
+
     floatTweenRef.current?.kill();
     floatTweenRef.current = gsap.to(card, {
       y: `-=${floatRange}`,
@@ -79,75 +79,78 @@ export const FloatingCard = ({
   // =========================================================
   // APERTURA AL CENTRO (Zero Sobbalzi)
   // =========================================================
-  const openCard = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!cardRef.current || isExpanded) return;
+  const openCard = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!cardRef.current || isExpanded) return;
 
-    const card = cardRef.current;
-    
-    // 1. PULIZIA PRE-ANIMAZIONE
-    floatTweenRef.current?.pause();
-    gsap.killTweensOf(card);
-    card.classList.add("is-focused");
+      const card = cardRef.current;
 
-    const rect = card.getBoundingClientRect();
-    const computedStyle = window.getComputedStyle(card);
-    
-    // Calcolo dimensioni finali (mantenendo aspect ratio controllato)
-    const finalWidth = Math.min(1100, window.innerWidth * 0.88);
-    const finalHeight = Math.min(800, window.innerHeight * 0.82); 
-    const targetLeft = (window.innerWidth - finalWidth) / 2;
-    const targetTop = (window.innerHeight - finalHeight) / 2;
+      // 1. PULIZIA PRE-ANIMAZIONE
+      floatTweenRef.current?.pause();
+      gsap.killTweensOf(card);
+      card.classList.add("is-focused");
 
-    // 2. SALVATAGGIO STATO ORIGINALE
-    originalTransformRef.current = {
-      x: Number(gsap.getProperty(card, "x")) || 0,
-      y: Number(gsap.getProperty(card, "y")) || 0,
-      width: style.width || rect.width,
-      height: style.height || rect.height,
-      position: computedStyle.position,
-      left: computedStyle.left,
-      top: computedStyle.top,
-      right: computedStyle.right,
-      bottom: computedStyle.bottom,
-      rectLeft: rect.left,
-      rectTop: rect.top,
-      rectWidth: rect.width,
-      rectHeight: rect.height,
-    };
+      const rect = card.getBoundingClientRect();
+      const computedStyle = window.getComputedStyle(card);
 
-    // 3. BLOCCO VISIVO ISTANTANEO (Unico gsap.set per evitare layout thrashing)
-    // Passiamo a fixed MA nelle stesse identiche coordinate visive attuali
-    gsap.set(card, {
-      position: "fixed",
-      left: rect.left,
-      top: rect.top,
-      right: "auto",
-      bottom: "auto",
-      width: rect.width,
-      height: rect.height,
-      x: 0,
-      y: 0,
-      rotation: 0,
-      scale: 1,
-      transformOrigin: "center center",
-      zIndex: 10001,
-    });
+      // Calcolo dimensioni finali (mantenendo aspect ratio controllato)
+      const finalWidth = Math.min(1100, window.innerWidth * 0.88);
+      const finalHeight = Math.min(800, window.innerHeight * 0.82);
+      const targetLeft = (window.innerWidth - finalWidth) / 2;
+      const targetTop = (window.innerHeight - finalHeight) / 2;
 
-    setIsExpanded(true);
+      // 2. SALVATAGGIO STATO ORIGINALE
+      originalTransformRef.current = {
+        x: Number(gsap.getProperty(card, "x")) || 0,
+        y: Number(gsap.getProperty(card, "y")) || 0,
+        width: style.width || rect.width,
+        height: style.height || rect.height,
+        position: computedStyle.position,
+        left: computedStyle.left,
+        top: computedStyle.top,
+        right: computedStyle.right,
+        bottom: computedStyle.bottom,
+        rectLeft: rect.left,
+        rectTop: rect.top,
+        rectWidth: rect.width,
+        rectHeight: rect.height,
+      };
 
-    // 4. ANIMAZIONE DI APERTURA (Più lenta e fluida)
-    gsap.to(card, {
-      left: targetLeft,
-      top: targetTop,
-      width: finalWidth,
-      height: finalHeight,
-      boxShadow: "0 40px 100px rgba(0,0,0,0.35)",
-      duration: 0.8, // Aumentato da 0.6 per fluidità
-      ease: "power3.inOut", // Accelerazione e decelerazione simmetriche ed eleganti
-      overwrite: "auto",
-    });
-  }, [isExpanded, style.width, style.height]);
+      // 3. BLOCCO VISIVO ISTANTANEO (Unico gsap.set per evitare layout thrashing)
+      // Passiamo a fixed MA nelle stesse identiche coordinate visive attuali
+      gsap.set(card, {
+        position: "fixed",
+        left: rect.left,
+        top: rect.top,
+        right: "auto",
+        bottom: "auto",
+        width: rect.width,
+        height: rect.height,
+        x: 0,
+        y: 0,
+        rotation: 0,
+        scale: 1,
+        transformOrigin: "center center",
+        zIndex: 10001,
+      });
+
+      setIsExpanded(true);
+
+      // 4. ANIMAZIONE DI APERTURA (Più lenta e fluida)
+      gsap.to(card, {
+        left: targetLeft,
+        top: targetTop,
+        width: finalWidth,
+        height: finalHeight,
+        boxShadow: "0 40px 100px rgba(0,0,0,0.35)",
+        duration: 0.8, // Aumentato da 0.6 per fluidità
+        ease: "power3.inOut", // Accelerazione e decelerazione simmetriche ed eleganti
+        overwrite: "auto",
+      });
+    },
+    [isExpanded, style.width, style.height],
+  );
 
   // =========================================================
   // CHIUSURA (Ritorno perfetto alla posizione originale)
@@ -217,7 +220,7 @@ export const FloatingCard = ({
   useEffect(() => {
     if (!cardRef.current || hasIntroAnimatedRef.current) return;
     hasIntroAnimatedRef.current = true;
-    
+
     const card = cardRef.current;
 
     const ctx = gsap.context(() => {
@@ -225,8 +228,10 @@ export const FloatingCard = ({
         if (!card) return;
 
         const rect = card.getBoundingClientRect();
-        const centerX = (window.innerWidth / 2) - (rect.left + rect.width / 2) + stackX;
-        const centerY = (window.innerHeight / 2) - (rect.top + rect.height / 2) + stackY;
+        const centerX =
+          window.innerWidth / 2 - (rect.left + rect.width / 2) + stackX;
+        const centerY =
+          window.innerHeight / 2 - (rect.top + rect.height / 2) + stackY;
 
         // Stato iniziale
         gsap.set(card, {
@@ -259,7 +264,7 @@ export const FloatingCard = ({
       floatTweenRef.current?.kill();
       ctx.revert();
     };
-  }, []); 
+  }, []);
 
   // =========================================================
   // GESTIONE ESC & SCROLL
@@ -316,7 +321,7 @@ export const FloatingCard = ({
       <div
         ref={cardRef}
         onClick={handleCardClick}
-        className={`cloud-glass-card p-5 position-absolute ${className} ${isExpanded ? "is-expanded" : ""}`}
+        className={`cloud-glass-card p-5 position-absolute ${className || ""} ${isExpanded ? "is-expanded" : ""} mobile-card-btn`}
         style={{
           zIndex: isExpanded ? 10001 : 30,
           transformStyle: "preserve-3d",
@@ -331,7 +336,9 @@ export const FloatingCard = ({
         {expandedContent && (
           <div
             className={`expansion-details overflow-auto ${
-              isExpanded ? "mt-3 pt-3 border-top opacity-100" : "max-height-0 m-0 p-0"
+              isExpanded
+                ? "mt-3 pt-3 border-top opacity-100"
+                : "max-height-0 m-0 p-0"
             }`}
             style={{
               maxHeight: isExpanded ? "calc(70vh - 80px)" : "0px",

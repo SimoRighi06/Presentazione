@@ -107,21 +107,155 @@
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  
-  /* Aumenta la dimensione base del testo ereditata da tutti i figli */
   font-size: 1.1rem; 
 }
 
-/* 2. Scala proporzionalmente tutto il blocco contenuti (testi, rettangoli colore, icone) */
 .cloud-glass-card.is-expanded > :not(button) {
   transform: scale(1.2);
   transform-origin: center center;
   width: 70%;
 }
 
-/* 3. Se hai elementi con font-size inline o classi utility che non scalano */
 .cloud-glass-card.is-expanded .expansion-details,
 .cloud-glass-card.is-expanded p,
 .cloud-glass-card.is-expanded span {
-  font-size: inherit; /* Forza ad ereditare il font-size della card */
+  font-size: inherit; 
+}
+
+
+
+/* =========================================================
+   RESPONSIVE FLOATING CARDS - DEFINITIVO
+========================================================= */
+
+/* DESKTOP: Il wrapper copre tutto il main, le card usano position:absolute inline */
+.floating-cards-wrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.floating-cards-wrapper > * {
+  pointer-events: auto;
+}
+
+/* MOBILE (max 768px): Trasforma le card in bottoni quadrati in fila */
+@media (max-width: 768px) {
+  .floating-cards-wrapper {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    margin-top: 1rem !important;
+    pointer-events: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  .mobile-card-btn {
+    /* Annulla position:absolute inline */
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    
+    /* Dimensioni quadrate fisse */
+    width: 100px !important;
+    height: 100px !important;
+    min-width: 100px !important;
+    min-height: 100px !important;
+    max-width: 100px !important;
+    max-height: 100px !important;
+    
+    /* Layout a pulsante */
+    padding: 0.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center;
+    
+    /* Blocca animazioni floating */
+    transform: none !important;
+    animation: none !important;
+  }
+
+  /* Nascondi tutto il contenuto quando la card è CHIUSA */
+  .mobile-card-btn:not(.is-expanded) ul,
+  .mobile-card-btn:not(.is-expanded) .mt-3,
+  .mobile-card-btn:not(.is-expanded) .mt-4,
+  .mobile-card-btn:not(.is-expanded) .color-swatch-rect,
+  .mobile-card-btn:not(.is-expanded) .border-bottom,
+  .mobile-card-btn:not(.is-expanded) .border-top,
+  .mobile-card-btn:not(.is-expanded) .ps-4,
+  .mobile-card-btn:not(.is-expanded) .ms-1,
+  .mobile-card-btn:not(.is-expanded) .list-unstyled,
+  .mobile-card-btn:not(.is-expanded) .d-flex.flex-column.gap-2 {
+    display: none !important;
+  }
+
+  /* Mostra SOLO il primo div (icona + titolo) */
+  .mobile-card-btn:not(.is-expanded) > div:first-child {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.25rem !important;
+  }
+
+  .mobile-card-btn:not(.is-expanded) svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .mobile-card-btn:not(.is-expanded) span {
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Indicatore "+" in basso a destra */
+  .mobile-card-btn:not(.is-expanded)::after {
+    content: "+";
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    width: 18px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #FF6D00;
+  }
+}
+
+/* Fix espansione su mobile */
+@media (max-width: 768px) {
+  .cloud-glass-card.is-expanded {
+    width: 92vw !important;
+    height: auto !important;
+    max-height: 85vh !important;
+    padding: 1.5rem !important;
+  }
+  
+  .cloud-glass-card.is-expanded > :not(button) {
+    transform: scale(1) !important;
+    width: 100%;
+  }
 }

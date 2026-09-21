@@ -225,7 +225,7 @@ export default function App() {
   // PAGE ENTRANCE ANIMATION
   // =========================================================
   useEffect(() => {
-    if (isConfigMode || viewMode !== "draft") return;
+    if (isConfigMode || viewMode !== "draft" || !containerRef.current) return;
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -242,7 +242,7 @@ export default function App() {
           { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 },
           "-=0.3",
         );
-    }, containerRef);
+    }, containerRef.current); // ✅ Ora TypeScript è contento
 
     return () => ctx.revert();
   }, [isConfigMode, viewMode]);
@@ -384,14 +384,90 @@ export default function App() {
       />
 
       <main className="d-flex flex-column align-items-center justify-content-center w-100 h-100 position-relative z-1">
+        {/* 1. BOZZA CENTRALE (PRIMA NEL DOM) */}
         <div
-          className=""
-          style={{
-            maxWidth: "1920px",
+          ref={stageRef}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => {
+            setIsFocusedOnDraft(true);
+            if (stageRef.current) {
+              gsap.to(stageRef.current, {
+                scale: 1.1,
+                duration: 0.7,
+                ease: "power3.out",
+              });
+            }
           }}
+          onMouseLeave={handleMouseLeaveStage}
+          className="center-stage-container cloud-glass-card p-0 shadow-lg overflow-hidden position-relative"
         >
-          {/* CARD 01 — FONT (Animazione Premium Lenta) */}
+          <div className="draft-viewport w-100 h-100 overflow-hidden rounded-4">
+            {isImage ? (
+              <div
+                className="w-100 h-100 overflow-y-auto bg-white position-relative"
+                onWheel={(e) => e.stopPropagation()}
+                onTouchMove={(e) => e.stopPropagation()}
+              >
+                {isImageLoading && (
+                  <div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white z-2">
+                    <div className="d-flex flex-column align-items-center gap-3">
+                      <img
+                        src={brandLogoUrl}
+                        alt={`${clientName} Logo`}
+                        className="mb-2"
+                        style={{
+                          maxHeight: "80px",
+                          objectFit: "contain",
+                          opacity: 0.5,
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                      <h3 className="fw-bold text-dark mb-0 fs-4">
+                        {clientName}
+                      </h3>
+                      <Loader2
+                        size={32}
+                        className="text-secondary animate-spin mt-2"
+                      />
+                      <p className="text-muted small mb-0 mt-2">
+                        Caricamento bozza in corso...
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <img
+                  src={imageUrl}
+                  alt={`Bozza ${draftUrl}`}
+                  className="w-100 d-block h-auto"
+                  decoding="async"
+                  style={{ objectFit: "contain", objectPosition: "top center" }}
+                  onLoad={() => setIsImageLoading(false)}
+                  onError={handleImageError}
+                />
+              </div>
+            ) : (
+              <iframe
+                key={draftUrl}
+                src={draftUrl}
+                title="Anteprima Bozza Cliente"
+                className={`w-100 h-100 border-0 d-block bg-white ${
+                  isInteractive
+                    ? "interactive-iframe"
+                    : "non-interactive-iframe"
+                }`}
+                loading="eager"
+              />
+            )}
+          </div>
+        </div>
+
+        {/* 2. WRAPPER CARD (DOPO LA BOZZA) */}
+        <div className="floating-cards-wrapper">
+          {/* CARD 01 — FONT */}
           <FloatingCard
+            className="mobile-card-btn"
             style={{ top: "40%", right: "5%", width: "330px" }}
             introDelay={0.25}
             introDuration={1.6}
@@ -440,8 +516,9 @@ export default function App() {
             )}
           </FloatingCard>
 
-          {/* CARD 03 — PALETTE (Animazione Premium Lenta) */}
+          {/* CARD 02 — PALETTE */}
           <FloatingCard
+            className="mobile-card-btn"
             style={{ top: "18%", left: "2.5%", width: "300px" }}
             introDelay={0.15}
             introDuration={1.6}
@@ -478,8 +555,9 @@ export default function App() {
             </div>
           </FloatingCard>
 
-          {/* CUSTOM CARD */}
+          {/* CARD 03 — CUSTOM */}
           <IndependentCustomCard
+            className="mobile-card-btn"
             config={config}
             style={{
               bottom: "8%",
@@ -499,92 +577,8 @@ export default function App() {
           />
         </div>
 
-        {/* CARD 02 — CREDITS */}
         <CreditsPopupCard azienda1="Tecnoprogress" />
-
         <InfoPopupCard dominio={config.dominio || `${siteParam}.com`} />
-
-        {/* CENTRAL WEBSITE PREVIEW */}
-        <div
-          ref={stageRef}
-          onMouseMove={handleMouseMove}
-          onMouseEnter={() => {
-            setIsFocusedOnDraft(true);
-            if (stageRef.current) {
-              gsap.to(stageRef.current, {
-                scale: 1.1,
-                duration: 0.7,
-                ease: "power3.out",
-              });
-            }
-          }}
-          onMouseLeave={handleMouseLeaveStage}
-          className="center-stage-container cloud-glass-card p-0 shadow-lg overflow-hidden position-relative"
-        >
-          <div className="draft-viewport w-100 h-100 overflow-hidden rounded-4">
-            {isImage ? (
-              <div
-                className="w-100 h-100 overflow-y-auto bg-white position-relative"
-                onWheel={(e) => e.stopPropagation()}
-                onTouchMove={(e) => e.stopPropagation()}
-              >
-                {/* ✅ LOADER: Sparisce ISTANTANEAMENTE grazie a onLoad sull'img sotto */}
-                {isImageLoading && (
-                  <div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white z-2">
-                    <div className="d-flex flex-column align-items-center gap-3">
-                      <img
-                        src={brandLogoUrl}
-                        alt={`${clientName} Logo`}
-                        className="mb-2"
-                        style={{
-                          maxHeight: "80px",
-                          objectFit: "contain",
-                          opacity: 0.5,
-                        }}
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
-                      <h3 className="fw-bold text-dark mb-0 fs-4">
-                        {clientName}
-                      </h3>
-                      <Loader2
-                        size={32}
-                        className="text-secondary animate-spin mt-2"
-                      />
-                      <p className="text-muted small mb-0 mt-2">
-                        Caricamento bozza in corso...
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* ✅ IMMAGINE: onLoad spegne il loader non appena è pronta (0ms di delay se in cache) */}
-                <img
-                  src={imageUrl}
-                  alt={`Bozza ${draftUrl}`}
-                  className="w-100 d-block h-auto"
-                  decoding="async"
-                  style={{ objectFit: "contain", objectPosition: "top center" }}
-                  onLoad={() => setIsImageLoading(false)}
-                  onError={handleImageError}
-                />
-              </div>
-            ) : (
-              <iframe
-                key={draftUrl}
-                src={draftUrl}
-                title="Anteprima Bozza Cliente"
-                className={`w-100 h-100 border-0 d-block bg-white ${
-                  isInteractive
-                    ? "interactive-iframe"
-                    : "non-interactive-iframe"
-                }`}
-                loading="eager"
-              />
-            )}
-          </div>
-        </div>
 
         <FooterHUD
           navItems={config.navItems}

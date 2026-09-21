@@ -10,6 +10,7 @@ interface IndependentCustomCardProps {
     customCardText?: string;
     customCardImageUrl?: string;
   };
+  className?: string;
   style?: React.CSSProperties;
   floatRange?: number;
   speed?: number;
