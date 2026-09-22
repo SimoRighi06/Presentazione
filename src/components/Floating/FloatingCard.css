@@ -123,9 +123,8 @@
 }
 
 
-
 /* =========================================================
-   RESPONSIVE FLOATING CARDS - DEFINITIVO
+   FLOATING CARDS WRAPPER
 ========================================================= */
 
 /* DESKTOP: Il wrapper copre tutto il main, le card usano position:absolute inline */
@@ -141,13 +140,14 @@
   pointer-events: auto;
 }
 
-/* MOBILE (max 768px): Trasforma le card in bottoni quadrati in fila */
+/* =========================================================
+   MOBILE (max 768px): Solo qui trasformiamo in flex
+========================================================= */
 @media (max-width: 768px) {
   .floating-cards-wrapper {
     position: relative !important;
     inset: auto !important;
     height: auto !important;
-    margin-top: 1rem !important;
     pointer-events: auto !important;
     display: flex !important;
     flex-direction: row !important;
@@ -158,7 +158,7 @@
     width: 100% !important;
   }
 
-  .mobile-card-btn {
+  .floating-cards-wrapper > .mobile-card-btn {
     /* Annulla position:absolute inline */
     position: relative !important;
     top: auto !important;
@@ -170,8 +170,8 @@
     /* Dimensioni quadrate fisse */
     width: 100px !important;
     height: 100px !important;
-    min-width: 100px !important;
-    min-height: 100px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
     max-width: 100px !important;
     max-height: 100px !important;
     
@@ -189,21 +189,21 @@
   }
 
   /* Nascondi tutto il contenuto quando la card è CHIUSA */
-  .mobile-card-btn:not(.is-expanded) ul,
-  .mobile-card-btn:not(.is-expanded) .mt-3,
-  .mobile-card-btn:not(.is-expanded) .mt-4,
-  .mobile-card-btn:not(.is-expanded) .color-swatch-rect,
-  .mobile-card-btn:not(.is-expanded) .border-bottom,
-  .mobile-card-btn:not(.is-expanded) .border-top,
-  .mobile-card-btn:not(.is-expanded) .ps-4,
-  .mobile-card-btn:not(.is-expanded) .ms-1,
-  .mobile-card-btn:not(.is-expanded) .list-unstyled,
-  .mobile-card-btn:not(.is-expanded) .d-flex.flex-column.gap-2 {
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) ul,
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) .mt-3,
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) .mt-4,
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) .color-swatch-rect,
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) .border-bottom,
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) .border-top,
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) .ps-4,
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) .ms-1,
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) .list-unstyled,
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) .d-flex.flex-column.gap-2 {
     display: none !important;
   }
 
   /* Mostra SOLO il primo div (icona + titolo) */
-  .mobile-card-btn:not(.is-expanded) > div:first-child {
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) > div:first-child {
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
@@ -215,19 +215,19 @@
     gap: 0.25rem !important;
   }
 
-  .mobile-card-btn:not(.is-expanded) svg {
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) svg {
     width: 24px !important;
     height: 24px !important;
   }
 
-  .mobile-card-btn:not(.is-expanded) span {
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded) span {
     font-size: 0.7rem !important;
     font-weight: 600 !important;
     line-height: 1.1 !important;
   }
 
   /* Indicatore "+" in basso a destra */
-  .mobile-card-btn:not(.is-expanded)::after {
+  .floating-cards-wrapper > .mobile-card-btn:not(.is-expanded)::after {
     content: "+";
     position: absolute;
     bottom: 6px;
@@ -251,7 +251,6 @@
     width: 92vw !important;
     height: auto !important;
     max-height: 85vh !important;
-    padding: 1.5rem !important;
   }
   
   .cloud-glass-card.is-expanded > :not(button) {

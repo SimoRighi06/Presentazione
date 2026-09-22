@@ -466,6 +466,8 @@ export default function App() {
         {/* 2. WRAPPER CARD (DOPO LA BOZZA) */}
         <div className="floating-cards-wrapper">
           {/* CARD 01 — FONT */}
+
+
           <FloatingCard
             className="mobile-card-btn"
             style={{ top: "40%", right: "5%", width: "330px" }}
@@ -480,11 +482,11 @@ export default function App() {
             floatRotation={0.6}
           >
             <div
-              className="d-flex align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2"
+              className="d-flex  align-items-center gap-2 mb-3 text-muted font-monospace border-bottom pb-2"
               style={{ fontSize: "inherit" }}
             >
               <Type size={16} />
-              Font Utilizzati
+               <p className="d-none d-md-flex">Font Utilizzati</p>
             </div>
             <ul className="list-unstyled mb-0 ms-1 d-flex text-start ps-4 flex-column gap-2 mt-3">
               {config.fonts?.map((font, index) => (
