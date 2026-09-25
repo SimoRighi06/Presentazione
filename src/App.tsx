@@ -48,20 +48,57 @@ export default function App() {
   // CARICAMENTO CONFIG + SCORCIATOIA
   // =========================================================
   useEffect(() => {
-    fetch("/config.json")
-      .then((res) => {
+    const loadConfigFromQuery = () => {
+      const params = new URLSearchParams(window.location.search);
+      const encodedData = params.get("data");
+
+      if (!encodedData) {
+        return false;
+      }
+
+      try {
+        const decodedString = decodeURIComponent(
+          escape(atob(encodedData)),
+        );
+
+        const parsedConfig = JSON.parse(decodedString) as AppConfig;
+
+        setConfig(parsedConfig);
+
+        if (parsedConfig.dominio) {
+          setSiteParam(getSiteParamFromDomain(parsedConfig.dominio));
+        }
+
+        return true;
+      } catch (error) {
+        console.warn("Parametri config invalidi, fallback a config.json", error);
+        return false;
+      }
+    };
+
+    const loadConfigFromFile = async () => {
+      try {
+        const res = await fetch("/config.json");
         if (!res.ok) throw new Error("config.json non trovato");
-        return res.json();
-      })
-      .then((data: AppConfig) => {
+
+        const data = (await res.json()) as AppConfig;
+
         setConfig(data);
+
         if (data.dominio) {
           setSiteParam(getSiteParamFromDomain(data.dominio));
         }
-      })
-      .catch(() => {
+      } catch {
         setConfig(DEFAULT_CONFIG);
-      });
+        setSiteParam(getSiteParamFromDomain(DEFAULT_CONFIG.dominio));
+      }
+    };
+
+    const fromQuery = loadConfigFromQuery();
+
+    if (!fromQuery) {
+      void loadConfigFromFile();
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isClientView()) return;
