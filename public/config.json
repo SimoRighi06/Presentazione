@@ -1,11 +1,12 @@
 {
-  "dominio": "hotellabussola",
+  "dominio": "hoteltorbole",
   "hasPresentation": true,
   "presentationUrl": ".pdf",
   "colors": [
-    "#2B2B2B",
-    "#E2D3C3",
-    "#FFFFFF"
+    "#2F3A4C",
+    "#4F5B6B",
+    "#F1EFE2",
+    "#E4DACE"
   ],
   "fonts": [
     "Space Grotesk",

@@ -552,7 +552,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               ▶ Via Presentazione
             </button>
 
-            <ShareLinkGenerator siteParam={config.dominio} />
+            <ShareLinkGenerator siteParam={config.dominio} config={config} />
           </form>
         </div>
       </div>
