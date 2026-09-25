@@ -31,7 +31,7 @@ interface OriginalCardState {
 }
 
 export const IndependentCustomCard: React.FC<IndependentCustomCardProps> = ({
-  config, style = {}, floatRange = 16, speed = 4, introDelay = 0,
+  config, className = "", style = {}, floatRange = 16, speed = 4, introDelay = 0,
   introDuration = 1.15, stackX = 0, stackY = 0, introRotation = 0,
   introScale = 1, floatRotation = 1.5,
 }) => { 
@@ -194,7 +194,7 @@ export const IndependentCustomCard: React.FC<IndependentCustomCardProps> = ({
       {isOpen && (
         <div className="floating-card-overlay" onClick={closeCard} style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0, 0, 0, 0.4)", backdropFilter: "blur(4px)", zIndex: 10000 }} aria-hidden="true" />
       )}
-      <div ref={cardRef} onClick={handleCardClick} className="cloud-glass-card position-absolute" style={{ zIndex: isOpen ? 10001 : 30, transformStyle: "preserve-3d", willChange: "transform, width, left, top", cursor: isOpen ? "default" : "pointer", transition: "border-color 0.3s ease", width: isOpen ? undefined : style.width ?? "280px", height: isOpen ? undefined : style.height ?? "140px", ...(isOpen ? { alignItems: "stretch", justifyContent: "flex-start", textAlign: "left", display: "flex", flexDirection: "column" } : {}), ...style }}>
+      <div ref={cardRef} onClick={handleCardClick} className={`cloud-glass-card custom-floating-card position-absolute ${className || ""} ${isOpen ? "is-expanded" : ""}`} style={{ zIndex: isOpen ? 10001 : 30, transformStyle: "preserve-3d", willChange: "transform, width, left, top", cursor: isOpen ? "default" : "pointer", transition: "border-color 0.3s ease", width: isOpen ? undefined : style.width ?? "280px", height: isOpen ? undefined : style.height ?? "140px", ...(isOpen ? { alignItems: "stretch", justifyContent: "flex-start", textAlign: "left", display: "flex", flexDirection: "column" } : {}), ...style }}>
         {!isOpen && (
           <div className="w-100 h-100 p-3 d-flex flex-column justify-content-between">
             <div className="d-flex align-items-center justify-content-between">
@@ -205,7 +205,7 @@ export const IndependentCustomCard: React.FC<IndependentCustomCardProps> = ({
           </div>
         )}
         {isOpen && (
-          <div className="d-flex flex-column w-100 h-100 position-relative overflow-hidden">
+          <div className="custom-card-expanded-content d-flex flex-column w-100 h-100 position-relative overflow-hidden">
             <div className="d-flex align-items-center justify-content-between px-3 border-3">
               <div className="d-flex align-items-center w-100 mt-3 gap-2 mb-3 text-muted font-monospace border-bottom pb-2">
                 <Sparkles size={16} className="text-dark" />

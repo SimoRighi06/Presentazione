@@ -44,6 +44,11 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    pointer-events: none;
+  }
+
+  .credits-popup-wrapper > * {
+    pointer-events: auto;
   }
 
   .credits-popup-card {
@@ -109,6 +114,11 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    pointer-events: none;
+  }
+
+  .info-popup-wrapper > * {
+    pointer-events: auto;
   }
 
   .info-popup-card {

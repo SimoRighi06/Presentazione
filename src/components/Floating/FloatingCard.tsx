@@ -323,7 +323,7 @@ export const FloatingCard = ({
         onClick={handleCardClick}
         className={`cloud-glass-card p-5 position-absolute ${className || ""} ${isExpanded ? "is-expanded" : ""} mobile-card-btn`}
         style={{
-          zIndex: isExpanded ? 100 : 30,
+          zIndex: isExpanded ? 10001 : 30,
           transformStyle: "preserve-3d",
           willChange: "transform, width, height, left, top", 
           cursor: isExpanded ? "default" : "pointer",

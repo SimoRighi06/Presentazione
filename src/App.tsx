@@ -464,7 +464,7 @@ export default function App() {
         </div>
 
         {/* 2. WRAPPER CARD (DOPO LA BOZZA) */}
-        <div className="floating-cards-wrapper">
+        <div className="floating-cards-wrapper mt-2">
           {/* CARD 01 — FONT */}
 
 
