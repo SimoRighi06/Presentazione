@@ -207,6 +207,387 @@ Trasferisci: Trascina tutto il contenuto della cartella dist/ (non la cartella d
 
 
 
+---
+
+# Documento di analisi e documentazione della SPA
+
+Questo documento descrive la struttura, il flusso logico, i componenti principali e le regole di deployment della Single Page Application realizzata in React + Vite + TypeScript.
+
+## 1. Panoramica del progetto
+
+La SPA è una presentazione interattiva di bozze sito, con tre modalità principali:
+
+- vista bozza sito
+- vista presentazione PDF
+- modalità admin/configurazione
+
+I file principali sono:
+
+- [src/App.tsx](src/App.tsx)
+- [src/components/Presentation/PresentationViewer.tsx](src/components/Presentation/PresentationViewer.tsx)
+- [src/components/ConfigPan/ConfigPanel.tsx](src/components/ConfigPan/ConfigPanel.tsx)
+- [src/hooks/useAppRouting.ts](src/hooks/useAppRouting.ts)
+- [src/types/config.ts](src/types/config.ts)
+- [src/clientLink/index.ts](src/clientLink/index.ts)
+- [src/App.css](src/App.css)
+- [vite.config.ts](vite.config.ts)
+- [vercel.json](vercel.json)
+- [netlify.toml](netlify.toml)
+
+### Stack tecnico
+
+- React 19
+- TypeScript
+- Vite
+- GSAP
+- Bootstrap
+- Lucide React
+- react-pdf
+- Custom proxy route per immagini / contenuti del sito remoto
+
+---
+
+## 2. Obiettivo funzionale della SPA
+
+L’applicazione permette di:
+
+1. leggere una configurazione iniziale da [public/config.json](public/config.json) oppure da file esterno
+2. mostrare una bozza del sito tramite immagine o preview renderizzata
+3. passare tra varie pagine / draft / sezioni
+4. aprire una vista presentazione PDF
+5. modificare in modo rapido i parametri di configurazione in modalità admin
+6. gestire un percorso proxy per recuperare risorse esterne da un dominio BozzaSito
+
+In sintesi, la SPA è un “viewer di bozza + presentazione + configurazione” per siti aziendali o landing page.
+
+---
+
+## 3. Architettura applicativa
+
+```mermaid
+flowchart TD
+    A[Browser] --> B[App.tsx]
+    B --> C[useAppRouter]
+    B --> D[useClientView]
+    B --> E[Config Panel]
+    B --> F[PresentationViewer]
+    B --> G[Draft View]
+    B --> H[HeaderHUD / FooterHUD]
+
+    B --> I[fetch /config.json]
+    I --> J[AppConfig]
+    J --> K[siteParam]
+    K --> L[Proxy /bozze-proxy/:site]
+    L --> M[bozzasito.com/bozze/...]
+
+    B --> N[GSAP Animations]
+    B --> O[Image / PDF rendering]
+    B --> P[Admin Login Gate]
+```
+
+### Schema logico
+
+```mermaid
+flowchart LR
+    U[Utente] --> A[App]
+    A --> V{ViewMode}
+    V -->|draft| D[Draft Preview]
+    V -->|presentation| P[PDF Presentation]
+    V -->|admin| C[ConfigPanel]
+
+    D --> I[Proxy immagini]
+    P --> PDF[react-pdf]
+    C --> S[Save config]
+    S --> JSON[config.json]
+```
+
+---
+
+## 4. Flusso di avvio dell’app
+
+L’app viene inizializzata in [src/App.tsx](src/App.tsx). La sequenza è:
+
+1. carica il router e lo stato applicativo
+2. esegue `useClientView` per capire se è una view client-side o un ambiente di configurazione
+3. legge `/config.json`
+4. imposta `siteParam` e `config`
+5. decide quale vista mostrare: draft, presentation o admin
+
+### Stato principale
+
+Gli stati importanti sono:
+
+- `viewMode`: "draft" | "presentation" | "admin"
+- `isConfigMode`: modalità editor
+- `siteParam`: identificativo del sito, ad esempio `miosito`
+- `draftUrl`: pagina / draft attiva
+- `isFocusedOnDraft`: stato visuale per l’hover/tilt
+- `isImageLoading`: loader per immagine o PDF
+
+---
+
+## 5. Motore del routing e delle modalità
+
+La logica di routing è gestita da [src/hooks/useAppRouting.ts](src/hooks/useAppRouting.ts). Questa parte decide se l’app deve mostrare:
+
+- una preview del sito in draft
+- la presentazione PDF
+- il pannello amministrativo
+
+Il file [src/App.tsx](src/App.tsx) usa questo routing come orchestratore principale per le diverse viste. La struttura è molto chiara e permette di cambiare modalità senza ricostruire l’intera app.
+
+---
+
+## 6. Vista Draft: la bozza sito
+
+La bozza è la vista principale. È composta da:
+
+- HeaderHUD
+- centro con la preview della pagina
+- floating cards informativi
+- eventuali card di contenuto, crediti o popup
+
+### Elementi chiave
+
+- [src/App.tsx](src/App.tsx): struttura completa della pagina principale
+- [src/App.css](src/App.css): styling del contenitore, stage 3D, layout mobile
+- [src/components/HUD/HeaderHUD.tsx](src/components/HUD/HeaderHUD.tsx): top bar di navigazione
+- [src/components/Floating](src/components/Floating): floating cards e overlay info
+
+### Funzionamento della preview
+
+La preview può mostrare:
+
+- una immagine `.jpg` o `.webp`
+- una URL remota del sito
+- un placeholder se l’immagine non esiste
+
+Quando l’immagine non viene trovata, il codice provvede a un fallback intelligente:
+
+1. prova `.webp`
+2. se fallisce prova `.jpg`
+3. se anche JPG non esiste mostra un placeholder statico
+
+Questo comportamento si vede in [src/App.tsx](src/App.tsx).
+
+---
+
+## 7. Prototipo di rendering immagini e proxy
+
+Le immagini provenienti dal server remoto vengono richieste tramite un proxy interno:
+
+```txt
+/bozze-proxy/:site/images/nome-file.jpg
+```
+
+che viene tradotto, in IIS o in un reverse proxy, in:
+
+```txt
+http://:site.bozzasito.com/bozze/images/nome-file.jpg
+```
+
+La logica viene usata in [src/App.tsx](src/App.tsx) e [src/components/Presentation/PresentationViewer.tsx](src/components/Presentation/PresentationViewer.tsx).
+
+### Schema di richiesta
+
+```mermaid
+sequenceDiagram
+    participant U as Browser
+    participant A as React SPA
+    participant P as /bozze-proxy
+    participant B as bozzasito.com
+
+    U->>A: richiede immagine bozza
+    A->>P: /bozze-proxy/miosito/images/bozza01.jpg
+    P->>B: http://miosito.bozzasito.com/bozze/images/bozza01.jpg
+    B-->>P: immagine
+    P-->>A: risposta
+    A-->>U: preview renderizzata
+```
+
+---
+
+## 8. Vista presentazione PDF
+
+La presentazione è gestita da [src/components/Presentation/PresentationViewer.tsx](src/components/Presentation/PresentationViewer.tsx).
+
+Caratteristiche:
+
+- utilizza `react-pdf`
+- carica il worker PDF da un CDN versionato
+- visualizza solo un numero limitato di pagine con sliding window
+- supporta navigazione con frecce e tastiera
+
+### Pattern di rendering
+
+```mermaid
+flowchart TD
+    PDF[PresentationViewer] --> D[Document]
+    D --> P1[Page 1]
+    D --> P2[Page 2]
+    D --> P3[Page 3]
+    D --> W[Worker PDF]
+
+    P1 --> C[Canvas di render]
+    P2 --> C
+    P3 --> C
+```
+
+### Vantaggi
+
+- riduce il numero di pagine renderizzate contemporaneamente
+- mantiene la vista fluida
+- evita il sforzo eccessivo del browser su PDF grandi
+
+---
+
+## 9. Configurazione e admin
+
+La parte di amministrazione è in [src/components/ConfigPan/ConfigPanel.tsx](src/components/ConfigPan/ConfigPanel.tsx).
+
+Permette di:
+
+- modificare la configurazione del sito
+- definire `dominio`, `navItems`, `presentationUrl`, ecc.
+- esportare / importare la configurazione
+- salvare i parametri nel cliente
+
+La configurazione è definita in [src/types/config.ts](src/types/config.ts).
+
+### Esempio di modello di configurazione
+
+```ts
+export interface AppConfig {
+  dominio?: string;
+  presentationUrl?: string;
+  navItems?: Array<{
+    id: string;
+    draftUrl?: string;
+    label?: string;
+  }>;
+}
+```
+
+---
+
+## 10. Animazioni e interazioni
+
+La SPA usa GSAP per:
+
+- animazione di ingresso della pagina
+- tilt 3D del contenitore principale
+- floating cards e overlay
+- transizioni smooth dei componenti
+
+L’animazione principale è orchestrata in [src/App.tsx](src/App.tsx) con `gsap.timeline()`.
+
+### Schema di interazione
+
+```mermaid
+sequenceDiagram
+    participant U as Mouse / Touch
+    participant A as App
+    participant G as GSAP
+
+    U->>A: mousemove
+    A->>A: calcolo rotateX/rotateY
+    A->>G: gsap.to(stageRef)
+    G-->>U: animazione 3D fluida
+```
+
+---
+
+## 11. Responsive design e mobile
+
+Il layout è progettato per adattarsi a desktop e mobile. La base CSS di [src/App.css](src/App.css) definisce dimensioni, sfondi, contenitori centrati e media-query.
+
+### Regola chiave del mobile
+
+Quando la larghezza è inferiore a 480px, la preview viene forzata a mantenere il rapporto 16:9, equivalente a 1920x1080. Questo evita deformazioni e allungamenti della bozza.
+
+```css
+@media (max-width: 480px) {
+  width: min(88vw, 430px);
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+```
+
+Questo è importante perché la preview del sito ha un aspetto “televisivo” o “proiezione desktop” e la SPA deve preservare la dimensione corretta anche su smartphone.
+
+---
+
+## 12. Build e deployment
+
+La build di produzione viene creata con:
+
+```bash
+npm run build
+```
+
+Il comando usa Vite e TypeScript:
+
+```json
+"build": "tsc -b && vite build"
+```
+
+### Output build
+
+La cartella di produzione è [dist](dist). All’interno troviamo:
+
+- [dist/index.html](dist/index.html)
+- [dist/assets](dist/assets)
+- [dist/config.json](dist/config.json)
+- [dist/web.config](dist/web.config)
+- [dist/_redirects](dist/_redirects)
+
+### Deploy consigliato
+
+Per un server IIS, il contenuto di [dist](dist) va pubblicato nella root del sito con una regola di rewrite per SPA e una regola di proxy per `/bozze-proxy/*`.
+
+---
+
+## 13. Punti forti dell’architettura
+
+- separazione chiara tra view, configurazione e rendering
+- supporto a multiple modalità
+- gestione intelligente di immagini e fallback
+- uso di GSAP per animazioni efficaci
+- gestione ottimizzata di PDF via sliding window
+- supporto a deployment statico su server aziendale
+
+---
+
+## 14. Criticità / margini di miglioramento
+
+1. il bundle PDF può essere ulteriormente ottimizzato tramite lazy loading
+2. il worker PDF può essere portato localmente invece che da CDN esterno
+3. bootstrap CSS completo può essere ridotto per snellire il payload iniziale
+4. eventuale refactor per migliorare il codice in alcuni punti di state management
+
+---
+
+## 15. Conclusione
+
+Questa SPA è un sistema modulare e orientato alla presentazione visiva di bozze di siti: combina preview di layout, animazioni, presentazione PDF e configurazione centralizzata in un’unica esperienza utente coerente.
+
+La parte più importante è il suo design architetturale:
+
+- routing a vista
+- proxy di contenuti remoti
+- preview fluidi e responsivi
+- build statica pronta per hosting aziendale
+
+Il progetto è quindi pronto per essere pubblicato come applicazione statica, con il giusto setup del server web per il fallback SPA e il rewrite del proxy.
+
+
+---
+
+
+
+
+
+
 
 ```
 presentazione2
