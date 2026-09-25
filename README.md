@@ -8,6 +8,8 @@ Questo documento fornisce una verifica completa di tutti i processi sincroni e a
 - git add . 
 - git commit -m "testo"
 - git push origin main (nome branch)
+
+- git reset --hard HEAD~1 (tornare indetro coi commit)
 ```
 ---
 
