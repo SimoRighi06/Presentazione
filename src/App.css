@@ -99,7 +99,7 @@ h1 {
     width: 85vw;
     height: 65vh;
     min-height: 280px;
-    transform: translateY(-3vh) !important;
+    transform: translateY(-.5vh) !important;
     border-radius: 14px;
   }
 

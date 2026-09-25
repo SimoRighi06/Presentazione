@@ -537,7 +537,7 @@ export default function App() {
               style={{ fontSize: "0.85rem" }}
             >
               <Palette size={16} />
-              Palette Colori
+              <p className="d-none d-md-felx"> Palette Colori</p>
             </div>
             <div className="d-flex flex-column gap-2 ms-1">
               {config.colors?.map((hex, index) => (
