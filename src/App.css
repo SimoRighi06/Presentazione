@@ -96,9 +96,11 @@ h1 {
   }
 
   @media (max-width: 480px) {
-    width: 85vw;
-    height: 65vh;
-    min-height: 280px;
+    width: min(88vw, 430px);
+    height: auto;
+    aspect-ratio: 16 / 9;
+    min-height: 0;
+    max-height: 72vh;
     transform: translateY(-.5vh) !important;
     border-radius: 14px;
   }

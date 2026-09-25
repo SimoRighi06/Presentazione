@@ -181,7 +181,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
       <div
         className="position-absolute start-50 translate-middle-x d-block mt-3 d-sm-none"
         style={{
-          top: "2rem",
+          top: "4.5rem",
           textAlign: "center",
         }}
       >
