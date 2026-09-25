@@ -96,7 +96,7 @@ h1 {
   }
 
   @media (max-width: 480px) {
-    width: min(88vw, 430px);
+    width: min(96vw, 430px);
     height: auto;
     aspect-ratio: 16 / 9;
     min-height: 0;
