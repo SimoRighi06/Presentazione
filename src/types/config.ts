@@ -32,7 +32,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   navItems: [
     { id: "home", label: "Home", draftUrl: "bozza01", path: "#home" },
     { id: "menu", label: "Menu", draftUrl: "bozza02", path: "#menu" },
-    { id: "pagina1", label: "Pagina1", draftUrl: "bozza03", path: "#pagina1" },
+    /* { id: "pagina1", label: "Pagina1", draftUrl: "bozza03", path: "#pagina1" }, */
   ],
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
+import { HeaderHUD } from "../HUD/HeaderHUD";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -11,16 +12,22 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.vers
 
 interface PresentationViewerProps {
   siteParam: string;
+  dominio: string;
+  currentUrl: string;
   presentationUrl?: string;
   navItems: { id: string; draftUrl?: string }[];
+  onUrlChange: (url: string) => void;
   onStartDraft: () => void;
   onOpenAdmin: () => void;
 }
 
 export const PresentationViewer: React.FC<PresentationViewerProps> = ({
   siteParam,
+  dominio,
+  currentUrl,
   presentationUrl,
   navItems,
+  onUrlChange,
   onStartDraft,
 }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
@@ -139,9 +146,14 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
   return (
     <div className="cloud-viewport">
       <div className="cloud-bg-canvas" />
+      <HeaderHUD
+        currentUrl={currentUrl}
+        onUrlChange={onUrlChange}
+        dominio={dominio}
+      />
       <main className="d-flex flex-column align-items-center justify-content-center w-100 h-100 position-relative z-1 p-4 pt-5">
         <div
-          className="center-stage-container cloud-glass-card p-0 shadow-lg overflow-hidden position-relative mb-4 d-flex align-items-center justify-content-center bg-white mt-4"
+          className="center-stage-container cloud-glass-card p-0 shadow-lg overflow-hidden position-relative mb-4 d-flex align-items-center justify-content-center bg-white mt-5"
           style={{ width: "100%", maxWidth: "1570px", height: "85vh" }}
         >
           {currentPdfSrc ? (
