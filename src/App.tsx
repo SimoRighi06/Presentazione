@@ -523,7 +523,7 @@ export default function App() {
               style={{ fontSize: "inherit" }}
             >
               <Type size={16} />
-               <p className="d-none d-md-flex">Font Utilizzati</p>
+               <p className="d-none d-md-flex m-0">Font Utilizzati</p>
             </div>
             <ul className="list-unstyled mb-0 ms-1 d-flex text-start ps-4 flex-column gap-2 mt-3">
               {config.fonts?.map((font, index) => (
@@ -574,7 +574,7 @@ export default function App() {
               style={{ fontSize: "0.85rem" }}
             >
               <Palette size={16} />
-              <p className="d-none d-md-felx"> Palette Colori</p>
+              <p className="d-none d-md-flex m-0"> Palette Colori</p>
             </div>
             <div className="d-flex flex-column gap-2 ms-1">
               {config.colors?.map((hex, index) => (

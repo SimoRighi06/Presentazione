@@ -13,7 +13,7 @@ export interface NavItem {
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: "home", label: "Home", draftUrl: "bozza01" },
   { id: "menu", label: "Menu", draftUrl: "bozza02" },
-  { id: "pagina1", label: "Pagina1", draftUrl: "bozza03" },
+  /* { id: "pagina1", label: "Pagina1", draftUrl: "bozza03" }, */
 ];
 
 interface ConfigPanelProps {
