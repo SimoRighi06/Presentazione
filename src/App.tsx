@@ -352,8 +352,11 @@ export default function App() {
         {viewMode === "presentation" && (
           <PresentationViewer
             siteParam={siteParam}
+            dominio={config.dominio || `${siteParam}.com`}
+            currentUrl={draftUrl}
             presentationUrl={config.presentationUrl}
             navItems={config.navItems || []}
+            onUrlChange={handleUrlChange}
             onStartDraft={() => {
               setViewMode("draft");
               setIsConfigMode(false);
@@ -388,8 +391,11 @@ export default function App() {
     return (
       <PresentationViewer
         siteParam={siteParam}
+        dominio={config.dominio || `${siteParam}.com`}
+        currentUrl={draftUrl}
         presentationUrl={config.presentationUrl}
         navItems={config.navItems || []}
+        onUrlChange={handleUrlChange}
         onStartDraft={() => {
           setViewMode("draft");
           setIsConfigMode(false);
