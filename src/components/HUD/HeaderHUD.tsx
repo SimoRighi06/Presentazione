@@ -89,7 +89,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
             className="m-0 fs-3 fs-md-4 fw-normal text-dark text-truncate"
             style={{ maxWidth: "300px", whiteSpace: "nowrap" }}
           >
-            <strong>{dominio}</strong>
+            <strong>{dominio}.it</strong>
           </h1>
         </div>
 
