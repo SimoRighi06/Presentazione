@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ArrowLeft, ArrowRight, Loader2} from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -39,6 +39,7 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
   const currentPdfSrc = useMemo(() => {
     if (!presentationUrl) return "";
     if (
+      presentationUrl.startsWith("/") ||
       presentationUrl.startsWith("blob:") ||
       presentationUrl.startsWith("http")
     ) {

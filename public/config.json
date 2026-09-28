@@ -1,16 +1,18 @@
 {
   "dominio": "hoteltorbole",
   "hasPresentation": true,
-  "presentationUrl": ".pdf",
+  "presentationUrl": "/presentazione.pdf",
   "colors": [
-    "#2F3A4C",
-    "#4F5B6B",
-    "#F1EFE2",
-    "#E4DACE"
+    "#2f3b4c",
+    "#4f5b6b",
+    "#b6d4da",
+    "#e4dace",
+    "#f1efe2"
   ],
   "fonts": [
-    "Space Grotesk",
-    "Outfit"
+    "Tosh A",
+    "Mokoko",
+    "Acumin Pro"
   ],
   "textureUrl": "",
   "imageBaseUrl": "/assets/images/",
