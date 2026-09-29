@@ -16,8 +16,6 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
-
-  // RATE LIMITING: Stati per il blocco dopo 3 tentativi
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -35,7 +33,6 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
     if (!lockoutUntil) return;
 
     const interval = setInterval(() => {
-      // Date.now() qui è OK perché siamo dentro un useEffect (effetto collaterale)
       const remaining = Math.max(0, Math.ceil((lockoutUntil - Date.now()) / 1000));
       setTimeLeft(remaining);
 
@@ -59,8 +56,8 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
     e.preventDefault();
     setError("");
 
-    // FIX PUNTO 3: Se siamo bloccati, non fare nulla
-    if (timeLeft > 0) {
+    // La scadenza è la fonte autorevole, anche prima del primo tick del timer.
+    if (lockoutUntil !== null) {
       return;
     }
 
@@ -79,8 +76,9 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
       if (newAttempts >= 4) {
         // FIX PUNTO 3: Blocco per 60 secondi
         // Date.now() qui è OK perché siamo dentro un gestore di eventi (handleSubmit)
-        const lockTime = Date.now() + 30000;
+        const lockTime = Date.now() + 60000;
         setLockoutUntil(lockTime);
+        setTimeLeft(60);
         setError("Troppi tentativi. Riprova tra 60 secondi.");
       } else {
         setError(`Password errata. Tentativi rimasti: ${4 - newAttempts}`);
@@ -91,7 +89,7 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
     }
   };
 
-  const isLocked = timeLeft > 0;
+  const isLocked = lockoutUntil !== null;
 
   const handleCancel = () => {
     sessionStorage.removeItem("admin_authenticated");

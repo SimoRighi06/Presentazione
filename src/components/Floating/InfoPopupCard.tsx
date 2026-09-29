@@ -7,7 +7,7 @@ interface InfoPopupCardProps {
 }
 
 export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
-  dominio = "hotellabussola",
+  dominio = "hoteltorbole",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);

@@ -471,6 +471,7 @@ export default function App() {
                         src={brandLogoUrl}
                         alt={`${clientName} Logo`}
                         className="mb-2"
+                        loading="lazy"
                         style={{
                           maxHeight: "80px",
                           objectFit: "contain",
@@ -497,6 +498,7 @@ export default function App() {
                   src={imageUrl}
                   alt={`Bozza ${draftUrl}`}
                   className="w-100 d-block h-auto"
+                  loading="lazy"
                   decoding="async"
                   style={{ objectFit: "contain", objectPosition: "top center" }}
                   onLoad={() => setIsImageLoading(false)}
