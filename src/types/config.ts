@@ -24,9 +24,9 @@ export interface AppConfig {
 }
 
 export const DEFAULT_CONFIG: AppConfig = {
-  dominio: "hotellabussola", 
-  colors: ["#2B2B2B", "#E2D3C3", "#FFFFFF"],
-  fonts: ["Space Grotesk", "Outfit"],
+  dominio: "hoteltorbole", 
+  colors: ["#2f3b4c", "#4f5b6b", "#b6d4da", "#e4dace", "f1efe2"],
+  fonts: ["Tosh A", "Mokoko", "Acumin Pro"],
   textureUrl: "",
   imageBaseUrl: `${window.location.origin}/assets/images/`,
   navItems: [

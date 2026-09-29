@@ -19,7 +19,7 @@ export interface UseAppRouterReturn {
 // FUNZIONE HELPER: Pulizia dominio
 // =========================================================
 export const getSiteParamFromDomain = (domain: string | undefined): string => {
-  if (!domain) return "hotellabussola";
+  if (!domain) return "hoteltorbole";
   return domain
     .replace(/^https?:\/\//i, "")       // 1. Rimuove http:// o https://
     .replace(/^www\./i, "")             // 2. Rimuove www.
@@ -40,7 +40,7 @@ export const useAppRouter = (): UseAppRouterReturn => {
 
   const isConfigMode = viewMode === "admin";
 
-  const [siteParam, setSiteParam] = useState<string>("hotellabussola");
+  const [siteParam, setSiteParam] = useState<string>("hoteltorbole");
 
   // Wrapper per setIsConfigMode che aggiorna viewMode
   const setIsConfigMode = useCallback((value: boolean) => {
