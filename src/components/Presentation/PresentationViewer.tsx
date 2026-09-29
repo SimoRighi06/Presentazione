@@ -32,7 +32,12 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
 }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
+  const [activePageNumber, setActivePageNumber] = useState(1);
+  const [renderedPages, setRenderedPages] = useState<Set<number>>(
+    () => new Set([1]),
+  );
   const [loading, setLoading] = useState(true);
+  const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
 
   // Altezza PDF dinamica — reagisce al resize della finestra
   const [pdfHeight, setPdfHeight] = useState(() => window.innerHeight * 0.82);
@@ -59,10 +64,27 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
     ({ numPages }: { numPages: number }) => {
       setNumPages(numPages);
       setPageNumber(1);
+      setActivePageNumber(1);
+      setRenderedPages(new Set([1]));
       setLoading(false);
     },
     [],
   );
+
+  const onPageRenderSuccess = useCallback((renderedPage: number) => {
+    setRenderedPages((pages) => {
+      if (pages.has(renderedPage)) return pages;
+      const nextPages = new Set(pages);
+      nextPages.add(renderedPage);
+      return nextPages;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (renderedPages.has(pageNumber)) {
+      setActivePageNumber(pageNumber);
+    }
+  }, [pageNumber, renderedPages]);
 
   const prevPage = useCallback(
     () => setPageNumber((prev) => Math.max(prev - 1, 1)),
@@ -172,9 +194,9 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
                     key={`page_${pg}`}
                     className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
                     style={{
-                      visibility: pageNumber === pg ? "visible" : "hidden",
-                      opacity: pageNumber === pg ? 1 : 0,
-                      pointerEvents: pageNumber === pg ? "auto" : "none",
+                      visibility: activePageNumber === pg ? "visible" : "hidden",
+                      opacity: activePageNumber === pg ? 1 : 0,
+                      pointerEvents: activePageNumber === pg ? "auto" : "none",
                     }}
                   >
                     <Page
@@ -182,7 +204,9 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
                       height={pdfHeight}
+                      devicePixelRatio={devicePixelRatio}
                       className="pdf-page-render shadow-sm"
+                      onRenderSuccess={() => onPageRenderSuccess(pg)}
                     />
                   </div>
                 ))}

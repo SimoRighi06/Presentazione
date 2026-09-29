@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { lazy, Suspense, useState, useEffect, useRef } from "react";
 import { Palette, Type, Loader2 } from "lucide-react";
 import gsap from "gsap";
 import { FloatingCard } from "./components/Floating/FloatingCard";
@@ -7,13 +7,22 @@ import { FooterHUD } from "./components/HUD/FooterHUD";
 import { InfoPopupCard } from "./components/Floating/InfoPopupCard";
 import { ConfigPanel } from "./components/ConfigPan/ConfigPanel";
 import { CreditsPopupCard } from "./components/Floating/CreditCanvasCard";
-import { PresentationViewer } from "./components/Presentation/PresentationViewer";
 import { IndependentCustomCard } from "./components/Floating/CustomFloatingCard";
 import { type AppConfig, DEFAULT_CONFIG } from "./types/config";
 import { AdminLoginGate } from "./components/Login/AdminLoginGate";
 import { useAppRouter, getSiteParamFromDomain } from "./hooks/useAppRouting";
 import "./App.css";
 import { useClientView, isClientView } from "./clientLink";
+
+const PresentationViewer = lazy(
+  () => import("./components/Presentation/PresentationViewer"),
+);
+
+const presentationLoading = (
+  <div className="cloud-viewport d-flex align-items-center justify-content-center">
+    <Loader2 size={48} className="text-secondary animate-spin" />
+  </div>
+);
 
 export default function App() {
   const {
@@ -350,22 +359,24 @@ export default function App() {
     return (
       <>
         {viewMode === "presentation" && (
-          <PresentationViewer
-            siteParam={siteParam}
-            dominio={config.dominio || `${siteParam}.com`}
-            currentUrl={draftUrl}
-            presentationUrl={config.presentationUrl}
-            navItems={config.navItems || []}
-            onUrlChange={handleUrlChange}
-            onStartDraft={() => {
-              setViewMode("draft");
-              setIsConfigMode(false);
-            }}
-            onOpenAdmin={() => {
-              setViewMode("admin");
-              setIsConfigMode(true);
-            }}
-          />
+          <Suspense fallback={presentationLoading}>
+            <PresentationViewer
+              siteParam={siteParam}
+              dominio={config.dominio || `${siteParam}.com`}
+              currentUrl={draftUrl}
+              presentationUrl={config.presentationUrl}
+              navItems={config.navItems || []}
+              onUrlChange={handleUrlChange}
+              onStartDraft={() => {
+                setViewMode("draft");
+                setIsConfigMode(false);
+              }}
+              onOpenAdmin={() => {
+                setViewMode("admin");
+                setIsConfigMode(true);
+              }}
+            />
+          </Suspense>
         )}
         {viewMode === "admin" && (
           <ConfigPanel
@@ -389,22 +400,24 @@ export default function App() {
 
   if (viewMode === "presentation") {
     return (
-      <PresentationViewer
-        siteParam={siteParam}
-        dominio={config.dominio || `${siteParam}.com`}
-        currentUrl={draftUrl}
-        presentationUrl={config.presentationUrl}
-        navItems={config.navItems || []}
-        onUrlChange={handleUrlChange}
-        onStartDraft={() => {
-          setViewMode("draft");
-          setIsConfigMode(false);
-        }}
-        onOpenAdmin={() => {
-          setViewMode("admin");
-          setIsConfigMode(true);
-        }}
-      />
+      <Suspense fallback={presentationLoading}>
+        <PresentationViewer
+          siteParam={siteParam}
+          dominio={config.dominio || `${siteParam}.com`}
+          currentUrl={draftUrl}
+          presentationUrl={config.presentationUrl}
+          navItems={config.navItems || []}
+          onUrlChange={handleUrlChange}
+          onStartDraft={() => {
+            setViewMode("draft");
+            setIsConfigMode(false);
+          }}
+          onOpenAdmin={() => {
+            setViewMode("admin");
+            setIsConfigMode(true);
+          }}
+        />
+      </Suspense>
     );
   }
 
