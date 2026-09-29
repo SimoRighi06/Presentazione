@@ -583,10 +583,37 @@ Il progetto è quindi pronto per essere pubblicato come applicazione statica, co
 
 ---
 
+## SCHEMA PER BACKEND
+flowchart LR
+    B[Browser: SPA React] -->|file statici| IIS[IIS]
+    B -->|HTTPS /api/v1/*| IIS
+    IIS --> API[Backend]
+    API --> DB[(Database aziendale)]
+    API --> FILES[Archivio PDF e immagini]
+    API -->|proxy con allowlist e cache| EXT[Server bozze]
 
+---
 
+sequenceDiagram
+    actor Admin
+    actor Cliente
+    participant SPA as Frontend React
+    participant IIS
+    participant API as ASP.NET Core API
+    participant DB as SQL Server
 
+    Admin->>SPA: Salva configurazione
+    SPA->>IIS: PUT /api/v1/admin/presentations/{id}
+    IIS->>API: Inoltra richiesta
+    API->>DB: Salva configurazione
+    API-->>SPA: Link pubblico /p/hotel-labussola
 
+    Cliente->>IIS: Apre /p/hotel-labussola
+    IIS-->>Cliente: index.html della SPA
+    SPA->>IIS: GET /api/v1/public/presentations/hotel-labussola
+    IIS->>API: Inoltra richiesta
+    API->>DB: Cerca configurazione
+    API-->>SPA: Configurazione JSON
 
 
 ```
