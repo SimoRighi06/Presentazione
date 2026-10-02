@@ -11,7 +11,6 @@ import { IndependentCustomCard } from "./components/Floating/CustomFloatingCard"
 import { type AppConfig, DEFAULT_CONFIG } from "./types/config";
 import { AdminLoginGate } from "./components/Login/AdminLoginGate";
 import { useAppRouter, getSiteParamFromDomain } from "./hooks/useAppRouting";
-import "./App.css";
 import { useClientView, isClientView } from "./clientLink";
 
 const PresentationViewer = lazy(

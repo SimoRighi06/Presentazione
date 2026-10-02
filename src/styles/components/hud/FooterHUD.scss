@@ -1,0 +1,65 @@
+@use "../../mixins" as *;
+
+.footer-hud-wrapper {
+  width: auto;
+  max-width: 95vw;
+
+  @include mobile {
+    max-width: 98vw;
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+.footer-hud-nav {
+  max-width: 95vw;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @include mobile {
+    padding: 0.4rem 0.6rem !important;
+    gap: 0.4rem !important;
+  }
+
+  @include desktop {
+    overflow-x: visible;
+  }
+}
+
+.footer-nav-scroll {
+  flex-shrink: 0;
+}
+
+.footer-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  min-height: 36px;
+
+  @include mobile {
+    font-size: 0.75rem !important;
+    min-height: 32px !important;
+    padding: 0.35rem 0.6rem !important;
+  }
+}
+
+.footer-icon {
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+.footer-btn-text {
+  font-size: 0.85rem;
+
+  @include mobile {
+    font-size: 0.75rem !important;
+  }
+}

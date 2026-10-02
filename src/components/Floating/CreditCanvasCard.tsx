@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Code, X, User, Palette, Building, Briefcase } from "lucide-react";
 import gsap from "gsap";
-import "./CreditInfoCard.css"
+import "../../styles/components/floating/CreditCanvasCard.scss"
 
 interface CreditsPopupCardProps {
   azienda1?: string;

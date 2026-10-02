@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Sparkles, Maximize2 } from "lucide-react";
 import gsap from "gsap";
 import React from "react";
+import "../../styles/components/floating/CustomFloatingCard.scss";
 
 interface IndependentCustomCardProps {
   config: {

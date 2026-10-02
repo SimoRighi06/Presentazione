@@ -1,0 +1,28 @@
+@use "../../mixins" as *;
+
+@include mobile {
+  .floating-cards-wrapper > .custom-floating-card:not(.is-expanded) > div:first-child > div:last-child {
+    display: none !important;
+  }
+
+  .custom-card-expanded-content {
+    height: auto !important;
+    min-height: 0;
+    overflow-y: auto !important;
+
+    > .flex-grow-1 {
+      min-height: 0;
+      overflow: visible !important;
+
+      > div {
+        height: auto !important;
+      }
+    }
+
+    img {
+      height: auto !important;
+      max-height: 42dvh;
+      object-fit: contain !important;
+    }
+  }
+}

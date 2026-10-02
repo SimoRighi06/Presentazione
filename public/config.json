@@ -2,37 +2,13 @@
   "dominio": "hoteltorbole",
   "hasPresentation": true,
   "presentationUrl": "/presentazione.pdf",
-  "colors": [
-    "#2f3b4c",
-    "#4f5b6b",
-    "#b6d4da",
-    "#e4dace",
-    "#f1efe2"
-  ],
-  "fonts": [
-    "Tosh A",
-    "Mokoko",
-    "Acumin Pro"
-  ],
+  "colors": ["#2f3b4c", "#4f5b6b", "#b6d4da", "#e4dace", "#f1efe2"],
+  "fonts": ["Tosh A", "Mokoko", "Acumin Pro"],
   "textureUrl": "",
   "imageBaseUrl": "/assets/images/",
-  "navItems": [
-    {
-      "id": "home",
-      "label": "Home",
-      "draftUrl": "bozza01",
-      "path": "#home"
-    },
-    {
-      "id": "menu",
-      "label": "Menu",
-      "draftUrl": "bozza02",
-      "path": "#menu"
-    }
-  ],
+  "navItems": [ { "id": "home", "label": "Home", "draftUrl": "bozza01", "path": "#home" }, {"id": "menu","label": "Menu","draftUrl": "bozza02","path": "#menu"} ],
   "isCustomCardVisible": false,
   "customCardTitle": "Focus Progetto",
   "customCardText": "",
   "customCardImageUrl": ""
 }
-

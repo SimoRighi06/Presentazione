@@ -1,7 +1,7 @@
 import React from "react";
 import { Presentation } from "lucide-react";
 import { type NavItem } from "../../types/config";
-import "./FooterHUD.css"
+import "../../styles/components/hud/FooterHUD.scss"
 
 interface FooterHUDProps {
   navItems?: NavItem[];
