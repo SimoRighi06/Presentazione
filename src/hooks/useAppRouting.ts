@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-// =========================================================
-// TIPI E INTERFACCE
-// =========================================================
+// Tipi interfacce
 export type ViewMode = "admin" | "presentation" | "draft";
 
 export interface UseAppRouterReturn {
