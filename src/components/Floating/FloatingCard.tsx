@@ -108,9 +108,7 @@ export const FloatingCard = ({
     introScale,
   ]);
 
-  // =========================================================
-  // APERTURA AL CENTRO (Zero Sobbalzi)
-  // =========================================================
+
   const openCard = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -176,8 +174,8 @@ export const FloatingCard = ({
         width: finalWidth,
         height: finalHeight,
         boxShadow: "0 40px 100px rgba(0,0,0,0.35)",
-        duration: 0.8, // Aumentato da 0.6 per fluidità
-        ease: "power3.inOut", // Accelerazione e decelerazione simmetriche ed eleganti
+        duration: 0.8,
+        ease: "power3.inOut",
         overwrite: "auto",
       });
     },
@@ -213,7 +211,7 @@ export const FloatingCard = ({
       scale: 1,
       zIndex: 30,
       boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
-      duration: 0.7, // Leggermente più lenta per un atterraggio morbido
+      duration: 0.7, 
       ease: "power3.inOut",
       overwrite: "auto",
       onComplete: () => {
@@ -272,7 +270,7 @@ export const FloatingCard = ({
           y: centerY,
           scale: introState.introScale,
           rotation: introState.introRotation,
-          opacity: 0, // Partiamo da opacità 0 per un fade-in pulito
+          opacity: 0,
           transformOrigin: "center center",
         });
 

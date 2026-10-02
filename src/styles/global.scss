@@ -150,7 +150,7 @@ h1 {
 	@media (max-width: $breakpoint-small) {
 		width: min(96vw, 430px);
 		height: auto;
-		aspect-ratio: 16 / 9;
+		aspect-ratio: 16/9;
 		min-height: 0;
 		max-height: 72vh;
 		transform: translateY(-0.5vh) !important;
