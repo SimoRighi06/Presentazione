@@ -3,7 +3,7 @@ import { type AppConfig, DEFAULT_CONFIG } from "../../types/config";
 import { Download, Play, Plus, Trash2 } from "lucide-react";
 import { ShareLinkGenerator } from "../../clientLink";
 
-// Nav item interface
+// Interfaccia Navbar
 export interface NavItem {
   id: string;
   label: string;
@@ -38,17 +38,13 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   const [newFont, setNewFont] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string>("");
-
-  // ✅ SAFETY NET: Assicura che il body sia scrollabile quando il pannello è aperto
-  // (Risolve eventuali blocchi residui lasciati da FloatingCard o altri componenti)
   useEffect(() => {
     document.body.style.overflow = "auto";
     return () => {
-      // Opzionale: ripristina se necessario, ma di solito va bene lasciarlo auto
     };
   }, []);
 
-  // --- GESTIONE FONT ---
+  // Font
   const handleAddFont = () => {
     if (!newFont.trim()) return;
     setConfig((prev) => ({
@@ -65,13 +61,14 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
     }));
   };
 
-  // --- GESTIONE BOTTONI FOOTER ---
+  // Bottoni Footer
   const handleNavItemChange = (index: number, newLabel: string) => {
     const updatedNav = [...config.navItems];
     updatedNav[index] = { ...updatedNav[index], label: newLabel };
     setConfig((prev) => ({ ...prev, navItems: updatedNav }));
   };
 
+  // Handlre Nav item
   const handleAddNavItem = () => {
     const nextNumber = String(config.navItems.length + 1).padStart(2, "0");
     const newId = `nav_${Date.now()}`;
@@ -91,7 +88,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
     setConfig((prev) => ({ ...prev, navItems: updatedNav }));
   };
 
-  // --- GESTIONE FILE PDF LOCALE (DRAG & DROP) ---
+  // Gestione drag & drop
   const handleFileSelect = (file: File) => {
     if (file.type !== "application/pdf") {
       alert("Per favore, seleziona solo file PDF.");
@@ -115,7 +112,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
     }
   };
 
-  // --- ESPORTAZIONE JSON ---
+  // Easportazione del PDF
   const handleDownloadJSON = () => {
     const dataStr =
       "data:text/json;charset=utf-8," +
@@ -129,15 +126,12 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   };
 
   return (
-    // ✅ WRAPPER INFALLIBILE PER LO SCROLL: position-fixed + overflow-y-auto
     <div
       className="position-fixed top-0 start-0 w-100 h-100 overflow-y-auto bg-light"
       style={{ zIndex: 1050 }}
     >
       <div className="container py-4 py-md-5 px-3 px-md-4" style={{ maxWidth: "720px" }}>
         <div className="cloud-glass-card p-3 p-md-4 p-lg-5 rounded-4 w-100 text-dark mx-auto">
-          
-          {/* HEADER */}
           <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
             <h2 className="m-0 fs-4 fs-md-3 fw-bold">Pannello Configurazione</h2>
             <span className="badge bg-dark rounded-pill px-3 py-2">
@@ -149,7 +143,6 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             onSubmit={(e) => e.preventDefault()}
             className="d-flex flex-column gap-4"
           >
-            {/* DOMINIO CLIENTE */}
             <div className="py-4 py-md-5 border-bottom">
               <label
                 className="form-label text-uppercase fs-7 fw-bold text-muted"

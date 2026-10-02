@@ -7,7 +7,6 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import "../../styles/components/presentation/PresentationViewer.scss";
 
-// Setup Worker PDF — caricato dal CDN versionato (come da report)
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface PresentationViewerProps {
@@ -122,9 +121,7 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
     return pages;
   }, [pageNumber, numPages]);
 
-  // =========================================================
-  // PREFETCH delle immagini bozza — con cleanup dei link
-  // =========================================================
+  // Prefetch immagini
   useEffect(() => {
     if (!navItems || navItems.length === 0) return;
 
@@ -147,7 +144,6 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
         try {
           document.head.removeChild(link);
         } catch {
-          /* già rimosso o non presente */
         }
       });
     };

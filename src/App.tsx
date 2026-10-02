@@ -52,9 +52,7 @@ export default function App() {
     config.navItems?.[0]?.id || "home",
   );
 
-  // =========================================================
-  // CARICAMENTO CONFIG + SCORCIATOIA
-  // =========================================================
+  // Caricamento config
   useEffect(() => {
     const loadConfigFromQuery = () => {
       const params = new URLSearchParams(window.location.search);
@@ -123,23 +121,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [setSiteParam]);
 
-  // =========================================================
-  // ✅ RESET LOADER QUANDO CAMBIA L'IMMAGINE (Fondamentale)
-  // =========================================================
-  const isImage =
-    !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
-
-  /*   useEffect(() => {
-    if (isImage) {
-      setIsImageLoading(true); 
-    } else {
-      setIsImageLoading(false); 
-    }
-  }, [draftUrl, siteParam, isImage]); */
-
-  // =========================================================
-  // 🚀 PREFETCHING INTELLIGENTE (Elimina il delay al click)
-  // =========================================================
+  const isImage = !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
   useEffect(() => {
     if (!config.navItems || config.navItems.length === 0) return;
 
@@ -149,26 +131,21 @@ export default function App() {
 
     if (currentIndex === -1) return;
 
-    // Precarica la successiva e quella dopo ancora
+    // Caricamento immagine successiva
     const indicesToPrefetch = [currentIndex + 1, currentIndex + 2].filter(
       (i) => i < config.navItems.length,
     );
 
     const prefetchImage = (targetDraftUrl: string) => {
       if (!targetDraftUrl || targetDraftUrl.startsWith("http")) return;
-
-      // ✅ FIX: Per il prefetch in background, carichiamo direttamente il .jpg
-      // per evitare spam di 404 in console, sapendo che è il fallback garantito.
-      // La logica WebP -> JPG rimane attiva per l'immagine principale a schermo.
       const url = `/bozze-proxy/${siteParam}/images/${targetDraftUrl}.jpg`;
 
       const img = new Image();
       img.src = url;
-      img.loading = "eager"; // Priorità massima di download
+      img.loading = "eager";
     };
 
     const schedulePrefetch = () => {
-      // ✅ FIX: Tipizzazione corretta senza usare 'any'
       const win = window as Window &
         typeof globalThis & {
           requestIdleCallback?: (cb: IdleRequestCallback) => number;
@@ -182,7 +159,6 @@ export default function App() {
           });
         });
       } else {
-        // Fallback per browser che non supportano requestIdleCallback
         setTimeout(() => {
           indicesToPrefetch.forEach((i) => {
             const item = config.navItems[i];
@@ -194,15 +170,9 @@ export default function App() {
 
     schedulePrefetch();
   }, [draftUrl, siteParam, config.navItems]);
-
-  // =========================================================
-  // CLIENT / LOGO (✅ FIX HTTPS per Mixed Content)
-  // =========================================================
   const brandLogoUrl = `https://${siteParam}.bozzasito.com/bozze/images/logos/logo.png`;
 
-  // =========================================================
-  // TIPO DI BOZZA (Fallback WebP -> JPG)
-  // =========================================================
+  // Tipo bozza (Fallback WebP -> JPG)
   const imageUrl = isImage
     ? `/bozze-proxy/${siteParam}/images/${draftUrl}.webp`
     : draftUrl;
@@ -227,28 +197,21 @@ export default function App() {
     setIsImageLoading(false);
   };
 
-  // =========================================================
-  // NOME CLIENTE
-  // =========================================================
+  // Nome cliente
   const clientName = siteParam
     .replace(/-/g, " ")
     .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
 
-  // =========================================================
-  // CAMBIO URL
-  // =========================================================
+  // Cambio dell'url
   const handleUrlChange = (newUrl: string) => {
     if (newUrl === "live-reset") {
       setDraftUrl(
         `https://${siteParam}.bozzasito.com/bozze/bozza-preview.aspx#${activePage}`,
       );
-      setIsImageLoading(false); // È un iframe, spegni subito il loader
+      setIsImageLoading(false);
       return;
     }
-
     setDraftUrl(newUrl);
-
-    // ✅ RESETTA IL LOADER QUI, IN MODO SINCRONO E SICURO (senza useEffect)
     const isImg =
       !newUrl.startsWith("http://") && !newUrl.startsWith("https://");
     setIsImageLoading(isImg);
@@ -266,9 +229,7 @@ export default function App() {
     }
   };
 
-  // =========================================================
-  // PAGE ENTRANCE ANIMATION
-  // =========================================================
+  // Entrata della pagina 
   useEffect(() => {
     if (isConfigMode || viewMode !== "draft" || !containerRef.current) return;
 
@@ -287,14 +248,12 @@ export default function App() {
           { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 },
           "-=0.3",
         );
-    }, containerRef.current); // ✅ Ora TypeScript è contento
+    }, containerRef.current);
 
     return () => ctx.revert();
   }, [isConfigMode, viewMode]);
 
-  // =========================================================
-  // 3D TILT
-  // =========================================================
+  // handle del mouse 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!stageRef.current) return;
     const rect = stageRef.current.getBoundingClientRect();
@@ -328,9 +287,7 @@ export default function App() {
     });
   };
 
-  // =========================================================
-  // LOGIN GATE
-  // =========================================================
+  // Login
   const needsLogin = (isConfigMode || showAdminLogin) && !isAuthenticated;
 
   if (needsLogin) {
@@ -351,9 +308,7 @@ export default function App() {
     );
   }
 
-  // =========================================================
-  // GESTIONE VISTE (ADMIN / PRESENTATION / DRAFT)
-  // =========================================================
+  // Gestione viste (admin, presentation, client)
   if (isConfigMode) {
     return (
       <>
@@ -420,9 +375,7 @@ export default function App() {
     );
   }
 
-  // =========================================================
-  // MAIN (VISTA BOZZA SITO FINALE)
-  // =========================================================
+  // Return presentazione ecc...
   return (
     <div
       ref={containerRef}
@@ -523,8 +476,6 @@ export default function App() {
         {/* 2. WRAPPER CARD (DOPO LA BOZZA) */}
         <div className="floating-cards-wrapper mt-2">
           {/* CARD 01 — FONT */}
-
-
           <FloatingCard
             className="mobile-card-btn"
             style={{ top: "40%", right: "5%", width: "330px" }}

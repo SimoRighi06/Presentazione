@@ -20,7 +20,6 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
 
-  // FIX PUNTO 5: Se l'utente è già autenticato, entra direttamente
   useEffect(() => {
     const isAuthenticated = sessionStorage.getItem("admin_authenticated");
     if (isAuthenticated === "true") {
@@ -28,7 +27,6 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
     }
   }, [onSuccess]);
 
-  // Timer per il conto alla rovescia del blocco
   useEffect(() => {
     if (!lockoutUntil) return;
 
@@ -55,27 +53,22 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    // La scadenza è la fonte autorevole, anche prima del primo tick del timer.
     if (lockoutUntil !== null) {
       return;
     }
 
-    // FIX PUNTO 2: Codifica l'input in Base64 e confronta (no password in chiaro)
+    // Passwod in Base 64
     const inputBase64 = btoa(password);
 
     if (inputBase64 === PASSWORD_BASE64) {
-      // Successo
       sessionStorage.setItem("admin_authenticated", "true");
       onSuccess();
     } else {
-      // Fallimento
       const newAttempts = failedAttempts + 1;
       setFailedAttempts(newAttempts);
 
       if (newAttempts >= 4) {
-        // FIX PUNTO 3: Blocco per 60 secondi
-        // Date.now() qui è OK perché siamo dentro un gestore di eventi (handleSubmit)
+
         const lockTime = Date.now() + 60000;
         setLockoutUntil(lockTime);
         setTimeLeft(60);

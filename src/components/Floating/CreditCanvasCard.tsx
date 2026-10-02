@@ -21,10 +21,9 @@ export const CreditsPopupCard: React.FC<CreditsPopupCardProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Animazione GSAP per l'apertura
+  // Animazione GSAP
   useEffect(() => {
     if (isOpen && cardRef.current) {
-      // Kill eventuali animazioni precedenti per evitare conflitti
       gsap.killTweensOf(cardRef.current);
       
       gsap.fromTo(
