@@ -5,7 +5,7 @@
       "destination": "http://:site.bozzasito.com/bozze/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!.*\\.).*)",
       "destination": "/index.html"
     }
   ]
