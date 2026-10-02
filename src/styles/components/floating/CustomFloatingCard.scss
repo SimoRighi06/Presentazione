@@ -1,7 +1,8 @@
 @use "../../mixins" as *;
 
 @include mobile {
-  .floating-cards-wrapper > .custom-floating-card:not(.is-expanded) > div:first-child > div:last-child {
+  .floating-cards-wrapper > 
+  .custom-floating-card:not(.is-expanded) > div:first-child > div:last-child {
     display: none !important;
   }
 
