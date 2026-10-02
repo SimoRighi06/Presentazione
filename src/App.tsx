@@ -352,6 +352,7 @@ export default function App() {
     );
   }
 
+  // Modalità presentazione: richiamo di PresentazionViewer
   if (viewMode === "presentation") {
     return (
       <Suspense fallback={presentationLoading}>
@@ -375,7 +376,7 @@ export default function App() {
     );
   }
 
-  // Return presentazione ecc...
+  // Return presentazione
   return (
     <div
       ref={containerRef}
