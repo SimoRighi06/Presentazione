@@ -144,7 +144,9 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
         try {
           document.head.removeChild(link);
         } catch {
+          console.log("Header con i parametri corretti")
         }
+
       });
     };
   }, [siteParam, navItems]);

@@ -142,7 +142,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
               style={{ borderRadius: "50px", fontSize: "13px" }}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Visita il sito Tecnoprogress"
+              aria-label="Conosciamoci"
             >
               <span className=" text-white">Conosciamoci</span>
 
