@@ -16,16 +16,13 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
   dominio,
   onUrlChange,
 }) => {
-  // ✅ 1. Lazy initialization: risolve l'errore "setState in effect" del linter
   const [isAdminMode, setIsAdminMode] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get("mode") === "admin";
   });
 
-  // ✅ 2. Stato locale per l'input, sincronizzato in modo sicuro tramite useEffect
   const [inputValue, setInputValue] = useState(currentUrl);
-
-  // ✅ 3. Event listener per la scorciatoia da tastiera
+  
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.altKey || e.metaKey) && e.code === "KeyS") {

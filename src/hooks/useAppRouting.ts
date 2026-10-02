@@ -15,23 +15,18 @@ export interface UseAppRouterReturn {
   getSiteParamFromDomain: (domain: string | undefined) => string;
 }
 
-// =========================================================
-// FUNZIONE HELPER: Pulizia dominio
-// =========================================================
+// Creazione del link del dominio
 export const getSiteParamFromDomain = (domain: string | undefined): string => {
   if (!domain) return "hoteltorbole";
   return domain
-    .replace(/^https?:\/\//i, "")       // 1. Rimuove http:// o https://
-    .replace(/^www\./i, "")             // 2. Rimuove www.
-    .split("/")[0]                      // 3. Prende solo l'host, rimuove eventuali path
-    .split(".")[0]                      // 4. Prende la prima parte (es. "campingmaroadi")
-    .replace(/\s+/g, "")                // 5. Rimuove TUTTI gli spazi
-    .toLowerCase();                     // 6. Converte tutto in minuscolo
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")             
+    .split("/")[0]                     
+    .split(".")[0]                      
+    .replace(/\s+/g, "")                
+    .toLowerCase();                    
 };
 
-// =========================================================
-// CUSTOM HOOK: useAppRouter
-// =========================================================
 export const useAppRouter = (): UseAppRouterReturn => {
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     /* const urlParams = new URLSearchParams(window.location.search); */
@@ -39,17 +34,13 @@ export const useAppRouter = (): UseAppRouterReturn => {
   });
 
   const isConfigMode = viewMode === "admin";
-
   const [siteParam, setSiteParam] = useState<string>("hoteltorbole");
 
-  // Wrapper per setIsConfigMode che aggiorna viewMode
   const setIsConfigMode = useCallback((value: boolean) => {
     setViewMode(value ? "admin" : "draft");
   }, []);
 
-  // =========================================================
-  // SCORCIATOIA TASTIERA 
-  // =========================================================
+  // Scorciatoia tastiera 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (

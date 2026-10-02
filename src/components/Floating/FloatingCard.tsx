@@ -54,12 +54,8 @@ export const FloatingCard = ({
   const floatTweenRef = useRef<gsap.core.Tween | null>(null);
   const originalTransformRef = useRef<OriginalCardState | null>(null);
   const hasIntroAnimatedRef = useRef(false);
-
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // =========================================================
-  // ANIMAZIONE FLOATING (Background)
-  // =========================================================
   const startFloating = useCallback(() => {
     if (!cardRef.current || isExpanded) return;
     const card = cardRef.current;
@@ -71,7 +67,7 @@ export const FloatingCard = ({
       duration: speed,
       repeat: -1,
       yoyo: true,
-      ease: "sine.inOut", // La più morbida in assoluto per il floating
+      ease: "sine.inOut", 
     });
   }, [floatRange, speed, floatRotation, isExpanded]);
 
@@ -113,24 +109,19 @@ export const FloatingCard = ({
     (e: React.MouseEvent) => {
       e.stopPropagation();
       if (!cardRef.current || isExpanded) return;
-
       const card = cardRef.current;
 
-      // 1. PULIZIA PRE-ANIMAZIONE
       floatTweenRef.current?.pause();
       gsap.killTweensOf(card);
       card.classList.add("is-focused");
 
       const rect = card.getBoundingClientRect();
       const computedStyle = window.getComputedStyle(card);
-
-      // Calcolo dimensioni finali (mantenendo aspect ratio controllato)
       const finalWidth = Math.min(1100, window.innerWidth * 0.88);
       const finalHeight = Math.min(800, window.innerHeight * 0.82);
       const targetLeft = (window.innerWidth - finalWidth) / 2;
       const targetTop = (window.innerHeight - finalHeight) / 2;
 
-      // 2. SALVATAGGIO STATO ORIGINALE
       originalTransformRef.current = {
         x: Number(gsap.getProperty(card, "x")) || 0,
         y: Number(gsap.getProperty(card, "y")) || 0,
@@ -147,8 +138,6 @@ export const FloatingCard = ({
         rectHeight: rect.height,
       };
 
-      // 3. BLOCCO VISIVO ISTANTANEO (Unico gsap.set per evitare layout thrashing)
-      // Passiamo a fixed MA nelle stesse identiche coordinate visive attuali
       gsap.set(card, {
         position: "fixed",
         left: rect.left,
@@ -167,7 +156,6 @@ export const FloatingCard = ({
 
       setIsExpanded(true);
 
-      // 4. ANIMAZIONE DI APERTURA (Più lenta e fluida)
       gsap.to(card, {
         left: targetLeft,
         top: targetTop,
@@ -182,9 +170,6 @@ export const FloatingCard = ({
     [isExpanded, style.width, style.height],
   );
 
-  // =========================================================
-  // CHIUSURA (Ritorno perfetto alla posizione originale)
-  // =========================================================
   const closeCard = useCallback(() => {
     if (!cardRef.current || !isExpanded) return;
 
@@ -199,7 +184,6 @@ export const FloatingCard = ({
 
     gsap.killTweensOf(card);
 
-    // 1. ANIMAZIONE DI CHIUSURA
     gsap.to(card, {
       left: original.rectLeft,
       top: original.rectTop,
@@ -215,7 +199,6 @@ export const FloatingCard = ({
       ease: "power3.inOut",
       overwrite: "auto",
       onComplete: () => {
-        // 2. RIPRISTINO COMPLETO (Istantaneo, ma invisibile perché siamo già nella posizione esatta)
         gsap.set(card, {
           position: original.position,
           left: original.left,
@@ -236,7 +219,6 @@ export const FloatingCard = ({
         setIsExpanded(false);
         originalTransformRef.current = null;
 
-        // 3. RIATTIVAZIONE FLOATING (con requestAnimationFrame per evitare conflitti di frame)
         requestAnimationFrame(() => {
           if (cardRef.current) startFloating();
         });
@@ -244,15 +226,10 @@ export const FloatingCard = ({
     });
   }, [isExpanded, startFloating]);
 
-  // =========================================================
-  // ANIMAZIONE INIZIALE (Gira SOLO una volta al mount)
-  // =========================================================
   useEffect(() => {
     if (!cardRef.current || hasIntroAnimatedRef.current) return;
     hasIntroAnimatedRef.current = true;
-
     const card = cardRef.current;
-
     const ctx = gsap.context(() => {
       requestAnimationFrame(() => {
         if (!card) return;
@@ -264,7 +241,6 @@ export const FloatingCard = ({
         const centerY =
           window.innerHeight / 2 - (rect.top + rect.height / 2) + introState.stackY;
 
-        // Stato iniziale
         gsap.set(card, {
           x: centerX,
           y: centerY,
@@ -274,7 +250,6 @@ export const FloatingCard = ({
           transformOrigin: "center center",
         });
 
-        // Animazione di entrata
         gsap.to(card, {
           x: 0,
           y: 0,
@@ -299,9 +274,7 @@ export const FloatingCard = ({
     };
   }, []);
 
-  // =========================================================
-  // GESTIONE ESC & SCROLL
-  // =========================================================
+  // Gestione esc
   useEffect(() => {
     if (!isExpanded) return;
 
@@ -319,9 +292,7 @@ export const FloatingCard = ({
     };
   }, [isExpanded, closeCard]);
 
-  // =========================================================
-  // RENDER
-  // =========================================================
+  // Renderizzazione
   const handleCardClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isExpanded) {
