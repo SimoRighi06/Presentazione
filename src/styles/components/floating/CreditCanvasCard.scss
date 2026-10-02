@@ -1,0 +1,61 @@
+@use "../../mixins" as *;
+
+.credits-popup-wrapper {
+  bottom: 2%;
+  left: 2%;
+  z-index: 9999;
+
+  @include mobile {
+    left: 2%;
+    right: 2%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    pointer-events: none;
+
+    > * {
+      pointer-events: auto;
+    }
+  }
+}
+
+.credits-popup-card {
+  width: 420px;
+  max-width: calc(100vw - 2rem);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+
+  @include mobile {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+.credits-popup-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  @include mobile {
+    width: 48px !important;
+    height: 48px !important;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+}

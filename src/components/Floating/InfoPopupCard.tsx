@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Info, X, ShieldCheck, Building, MapPin, Phone, Mail } from "lucide-react";
 import gsap from "gsap";
+import "../../styles/components/floating/InfoPopupCard.scss";
 
 interface InfoPopupCardProps {
   dominio?: string;
@@ -14,7 +15,7 @@ export const InfoPopupCard: React.FC<InfoPopupCardProps> = ({
 
   useEffect(() => {
     if (isOpen && cardRef.current) {
-      gsap.killTweensOf(cardRef.current); // Evita conflitti di animazione
+      gsap.killTweensOf(cardRef.current);
       gsap.fromTo(
         cardRef.current,
         { scale: 0.9, opacity: 0, y: 30, transformOrigin: "bottom right" },

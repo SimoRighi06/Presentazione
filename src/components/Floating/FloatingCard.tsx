@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
-import "./FloatingCard.css";
+import "../../styles/components/floating/FloatingCard.scss";
 
 interface FloatingCardProps {
   children: React.ReactNode;
@@ -40,7 +40,6 @@ export const FloatingCard = ({
   expandedContent,
   className = "",
   style = {},
-  // ✅ DEFAULT OTTIMIZZATI: Più lenti, più "respiranti" e premium
   floatRange = 8,
   speed = 6.5,
   introDelay = 0.2,
@@ -54,7 +53,7 @@ export const FloatingCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const floatTweenRef = useRef<gsap.core.Tween | null>(null);
   const originalTransformRef = useRef<OriginalCardState | null>(null);
-  const hasIntroAnimatedRef = useRef(false); // ✅ FIX: Previene il riavvio dell'intro
+  const hasIntroAnimatedRef = useRef(false);
 
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -75,6 +74,39 @@ export const FloatingCard = ({
       ease: "sine.inOut", // La più morbida in assoluto per il floating
     });
   }, [floatRange, speed, floatRotation, isExpanded]);
+
+  const introStateRef = useRef({
+    isExpanded,
+    startFloating,
+    introDelay,
+    introDuration,
+    stackX,
+    stackY,
+    introRotation,
+    introScale,
+  });
+
+  useEffect(() => {
+    introStateRef.current = {
+      isExpanded,
+      startFloating,
+      introDelay,
+      introDuration,
+      stackX,
+      stackY,
+      introRotation,
+      introScale,
+    };
+  }, [
+    isExpanded,
+    startFloating,
+    introDelay,
+    introDuration,
+    stackX,
+    stackY,
+    introRotation,
+    introScale,
+  ]);
 
   // =========================================================
   // APERTURA AL CENTRO (Zero Sobbalzi)
@@ -226,19 +258,20 @@ export const FloatingCard = ({
     const ctx = gsap.context(() => {
       requestAnimationFrame(() => {
         if (!card) return;
+        const introState = introStateRef.current;
 
         const rect = card.getBoundingClientRect();
         const centerX =
-          window.innerWidth / 2 - (rect.left + rect.width / 2) + stackX;
+          window.innerWidth / 2 - (rect.left + rect.width / 2) + introState.stackX;
         const centerY =
-          window.innerHeight / 2 - (rect.top + rect.height / 2) + stackY;
+          window.innerHeight / 2 - (rect.top + rect.height / 2) + introState.stackY;
 
         // Stato iniziale
         gsap.set(card, {
           x: centerX,
           y: centerY,
-          scale: introScale,
-          rotation: introRotation,
+          scale: introState.introScale,
+          rotation: introState.introRotation,
           opacity: 0, // Partiamo da opacità 0 per un fade-in pulito
           transformOrigin: "center center",
         });
@@ -250,11 +283,13 @@ export const FloatingCard = ({
           scale: 1,
           rotation: 0,
           opacity: 1,
-          duration: introDuration,
-          delay: introDelay,
-          ease: "power3.out", // Più morbido di expo.out
+          duration: introState.introDuration,
+          delay: introState.introDelay,
+          ease: "power3.out",
           onComplete: () => {
-            if (!isExpanded) startFloating();
+            if (!introStateRef.current.isExpanded) {
+              introStateRef.current.startFloating();
+            }
           },
         });
       });

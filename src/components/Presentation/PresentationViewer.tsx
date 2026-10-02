@@ -5,7 +5,7 @@ import { HeaderHUD } from "../HUD/HeaderHUD";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-import "../../App.css";
+import "../../styles/components/presentation/PresentationViewer.scss";
 
 // Setup Worker PDF — caricato dal CDN versionato (come da report)
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -32,10 +32,10 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
 }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [activePageNumber, setActivePageNumber] = useState(1);
   const [renderedPages, setRenderedPages] = useState<Set<number>>(
     () => new Set([1]),
   );
+  const activePageNumber = renderedPages.has(pageNumber) ? pageNumber : 0;
   const [loading, setLoading] = useState(true);
   const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
 
@@ -64,7 +64,6 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
     ({ numPages }: { numPages: number }) => {
       setNumPages(numPages);
       setPageNumber(1);
-      setActivePageNumber(1);
       setRenderedPages(new Set([1]));
       setLoading(false);
     },
@@ -80,12 +79,6 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
     });
   }, []);
 
-  useEffect(() => {
-    if (renderedPages.has(pageNumber)) {
-      setActivePageNumber(pageNumber);
-    }
-  }, [pageNumber, renderedPages]);
-
   const prevPage = useCallback(
     () => setPageNumber((prev) => Math.max(prev - 1, 1)),
     [],
@@ -98,12 +91,11 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Buona pratica: ignora la navigazione se l'utente sta scrivendo in un input/textarea
       const target = e.target as HTMLElement;
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
 
       if (e.key === "ArrowLeft") {
-        e.preventDefault(); // Previene eventuali scroll orizzontali/verticali del browser
+        e.preventDefault();
         prevPage();
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
@@ -115,12 +107,8 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [prevPage, nextPage]); // Le dipendenze sono stabili grazie a useCallback
+  }, [prevPage, nextPage]);
 
-  // =========================================================
-  // SLIDING WINDOW: Calcola la finestra di pagine da renderizzare (corrente ±1)
-  // Solo queste 3 pagine vengono montate nel DOM, non tutte.
-  // =========================================================
   const visiblePages = useMemo(() => {
     if (!numPages) return [];
     const pages: number[] = [];
@@ -194,7 +182,8 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
                     key={`page_${pg}`}
                     className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
                     style={{
-                      visibility: activePageNumber === pg ? "visible" : "hidden",
+                      visibility:
+                        activePageNumber === pg ? "visible" : "hidden",
                       opacity: activePageNumber === pg ? 1 : 0,
                       pointerEvents: activePageNumber === pg ? "auto" : "none",
                     }}
