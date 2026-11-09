@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import type { AppConfig, NavItem } from "../../types/config";
 import { DEFAULT_DEV_SPEC } from "../../types/config";
 import {
+  SECTION_TEMPLATES,
+  SECTION_HEIGHT_RANGES,
+  type SectionTemplate,
+} from "../../types/config";
+import { MousePointer, Target, Code2 } from "lucide-react";
+
+import {
   X,
   Copy,
   Grid,
@@ -49,7 +56,7 @@ export const DevModeViewer: React.FC<DevModeViewerProps> = ({
   const [showFold, setShowFold] = useState(true);
   const [zoomMode, setZoomMode] = useState<"fit" | "original">("fit");
   const [rightPanelTab, setRightPanelTab] = useState<
-    "seo" | "typography" | "colors" | "notes"
+    "seo" | "typography" | "colors" | "notes" | "section"
   >("seo");
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
 
@@ -87,6 +94,92 @@ export const DevModeViewer: React.FC<DevModeViewerProps> = ({
   const [imgSrc, setImgSrc] = useState<string>(getInitialImgSrc);
   const [isImgLoading, setIsImgLoading] = useState(true);
   const [imgErrorStep, setImgErrorStep] = useState<number>(0); // 0: webp, 1: jpg, 2: png, 3: placeholder
+
+  const [selectedSection, setSelectedSection] =
+    useState<SectionTemplate | null>(null);
+  const [selectionMode, setSelectionMode] = useState<"click" | "drag">("click");
+  const [selectionBox, setSelectionBox] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(
+    null,
+  );
+
+  // Funzione per rilevare la sezione in base alla coordinata Y
+  const detectSectionFromY = (yPercent: number): SectionTemplate | null => {
+    for (const [sectionId, range] of Object.entries(SECTION_HEIGHT_RANGES)) {
+      if (yPercent >= range.min && yPercent < range.max) {
+        return SECTION_TEMPLATES[sectionId] || null;
+      }
+    }
+    return null;
+  };
+
+  // Handler click sull'immagine
+  const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (selectionMode !== "click") return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const yPercent = y / rect.height;
+
+    const detected = detectSectionFromY(yPercent);
+    setSelectedSection(detected);
+
+    // Mostra feedback visivo
+    setSelectionBox({
+      x: 0,
+      y: y - 20,
+      width: rect.width,
+      height: 40,
+    });
+  };
+
+  // Handler drag-to-select
+  const handleDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (selectionMode !== "drag") return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    setDragStart({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+    setIsDragging(true);
+  };
+
+  const handleDragMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging || !dragStart) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+
+    const x = Math.min(dragStart.x, currentX);
+    const y = Math.min(dragStart.y, currentY);
+    const width = Math.abs(currentX - dragStart.x);
+    const height = Math.abs(currentY - dragStart.y);
+
+    setSelectionBox({ x, y, width, height });
+  };
+
+  const handleDragEnd = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging || !selectionBox) return;
+
+    setIsDragging(false);
+    setDragStart(null);
+
+    // Calcola il centro della selezione
+    const centerY = selectionBox.y + selectionBox.height / 2;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const yPercent = centerY / rect.height;
+
+    const detected = detectSectionFromY(yPercent);
+    setSelectedSection(detected);
+  };
 
   // Quando cambiano siteParam o currentDraft, resettiamo lo stato
   useEffect(() => {
@@ -327,75 +420,111 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
 
       {/* SPLIT SCREEN WORKBENCH */}
       <div className="devmode-split">
-        {/* COLONNA SINISTRA: VIEWER BOZZA */}
+        {/* COLONNA SINISTRA: VIEWER BOZZA INTERATTIVO */}
         <div
           className={`devmode-left ${zoomMode === "original" ? "overflow-scroll-both" : "overflow-scroll-y"}`}
         >
           <div
             className={`viewer-wrapper ${zoomMode === "original" ? "wrapper-original" : "wrapper-fit"}`}
           >
-            {/* Loader durante il caricamento o fallback */}
-            {isImgLoading && !isExternalUrl && (
-              <div className="dev-img-loader">
-                <Loader2 size={40} className="animate-spin text-primary mb-2" />
-                <span className="small text-light">
-                  Caricamento bozza ({currentDraft})...
-                </span>
-                {imgErrorStep > 0 && (
-                  <span className="badge bg-secondary mt-1">
-                    Tentativo formato #{imgErrorStep + 1}
+            {/* WRAPPER CLICCABILE PER RILEVAMENTO SEZIONI */}
+            <div
+              className={`image-selection-wrapper ${selectionMode === "click" ? "cursor-crosshair" : "cursor-drag"}`}
+              onClick={handleImageClick}
+              onMouseDown={handleDragStart}
+              onMouseMove={handleDragMove}
+              onMouseUp={handleDragEnd}
+              onMouseLeave={(e) => {
+                if (isDragging) handleDragEnd(e as any);
+              }}
+            >
+              {/* Loader durante il caricamento o fallback */}
+              {isImgLoading && !isExternalUrl && (
+                <div className="dev-img-loader">
+                  <Loader2
+                    size={40}
+                    className="animate-spin text-primary mb-2"
+                  />
+                  <span className="small text-light">
+                    Caricamento bozza ({currentDraft})...
                   </span>
-                )}
-              </div>
-            )}
-
-            {/* OVERLAY GRIGLIA 12 COLONNE BOOTSTRAP */}
-            {showGrid && (
-              <div
-                className={`grid-overlay-container ${zoomMode === "original" ? "container-original" : "container-fit"}`}
-              >
-                <div className="bootstrap-grid-row">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} className="bootstrap-grid-col">
-                      <span className="col-label">{i + 1}</span>
-                    </div>
-                  ))}
+                  {imgErrorStep > 0 && (
+                    <span className="badge bg-secondary mt-1">
+                      Tentativo formato #{imgErrorStep + 1}
+                    </span>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* LINEE DI FOLD (DESKTOP 1080px e LAPTOP 900px) */}
-            {showFold && (
-              <>
-                <div className="fold-line fold-1080">
-                  <span className="fold-badge">
-                    FOLD 1080px (Standard Desktop)
-                  </span>
+              {/* OVERLAY GRIGLIA 12 COLONNE BOOTSTRAP */}
+              {showGrid && (
+                <div
+                  className={`grid-overlay-container ${zoomMode === "original" ? "container-original" : "container-fit"}`}
+                >
+                  <div className="bootstrap-grid-row">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <div key={i} className="bootstrap-grid-col">
+                        <span className="col-label">{i + 1}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="fold-line fold-900">
-                  <span className="fold-badge fold-badge-yellow">
-                    FOLD 900px (Laptop 14-15")
-                  </span>
-                </div>
-              </>
-            )}
+              )}
 
-            {/* IMMAGINE O IFRAME DELLA BOZZA */}
-            {isExternalUrl ? (
-              <iframe
-                src={imgSrc}
-                title={`Anteprima Bozza ${siteParam}`}
-                className="draft-iframe"
-              />
-            ) : (
-              <img
-                src={imgSrc}
-                alt={`Bozza ${currentDraft}`}
-                className={`draft-image ${zoomMode === "original" ? "img-original" : "img-fit"}`}
-                onLoad={() => setIsImgLoading(false)}
-                onError={handleImgError}
-              />
-            )}
+              {/* LINEE DI FOLD (DESKTOP 1080px e LAPTOP 900px) */}
+              {showFold && (
+                <>
+                  <div className="fold-line fold-1080">
+                    <span className="fold-badge">
+                      FOLD 1080px (Standard Desktop)
+                    </span>
+                  </div>
+                  <div className="fold-line fold-900">
+                    <span className="fold-badge fold-badge-yellow">
+                      FOLD 900px (Laptop 14-15")
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* IMMAGINE O IFRAME DELLA BOZZA */}
+              {isExternalUrl ? (
+                <iframe
+                  src={imgSrc}
+                  title={`Anteprima Bozza ${siteParam}`}
+                  className="draft-iframe"
+                />
+              ) : (
+                <img
+                  src={imgSrc}
+                  alt={`Bozza ${currentDraft}`}
+                  className={`draft-image ${zoomMode === "original" ? "img-original" : "img-fit"}`}
+                  onLoad={() => setIsImgLoading(false)}
+                  onError={handleImgError}
+                />
+              )}
+
+              {/* OVERLAY VISIVO SELEZIONE */}
+              {selectionBox && (
+                <div
+                  className="selection-overlay"
+                  style={{
+                    left: `${selectionBox.x}px`,
+                    top: `${selectionBox.y}px`,
+                    width: `${selectionBox.width}px`,
+                    height: `${selectionBox.height}px`,
+                  }}
+                />
+              )}
+
+              {/* BADGE SEZIONE RILEVATA */}
+              {selectedSection && (
+                <div className="detected-section-badge">
+                  <Target size={14} />
+                  <span>{selectedSection.name}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -431,6 +560,14 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
             >
               <CheckSquare size={15} /> Best Practice
             </button>
+            <button
+              type="button"
+              className={`tab-btn ${rightPanelTab === "section" ? "active" : ""}`}
+              onClick={() => setRightPanelTab("section")}
+            >
+              <MousePointer size={15} /> Sezione
+              {selectedSection && <span className="badge-active">●</span>}
+            </button>
           </div>
 
           <div className="console-content">
@@ -465,7 +602,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                             </span>
                           )}
                         </div>
-
                         {sec.headingText && (
                           <button
                             type="button"
@@ -482,13 +618,11 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                           </button>
                         )}
                       </div>
-
                       {sec.headingText && (
                         <h4 className="seo-heading-text">
                           "{sec.headingText}"
                         </h4>
                       )}
-
                       <div className="seo-meta-grid">
                         <div className="meta-box">
                           <span className="meta-label">Font Ruolo:</span>
@@ -500,7 +634,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                                 : `Font 3 (Body - ${typography.bodyFont})`}
                           </span>
                         </div>
-
                         {sec.layoutNote && (
                           <div className="meta-box">
                             <span className="meta-label">Layout:</span>
@@ -508,7 +641,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                           </div>
                         )}
                       </div>
-
                       {sec.techNote && (
                         <div className="tech-note-box">
                           <Sparkles
@@ -533,9 +665,7 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                     Associazione ruoli font e codice pronto da incollare
                   </p>
                 </div>
-
                 <div className="typo-roles-list">
-                  {/* FONT 1 */}
                   <div className="typo-role-card">
                     <div className="role-header">
                       <span className="badge-role badge-role-h1">
@@ -557,8 +687,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                       </span>
                     </div>
                   </div>
-
-                  {/* FONT 2 */}
                   <div className="typo-role-card">
                     <div className="role-header">
                       <span className="badge-role badge-role-sub">
@@ -583,8 +711,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                       </span>
                     </div>
                   </div>
-
-                  {/* FONT 3 */}
                   <div className="typo-role-card">
                     <div className="role-header">
                       <span className="badge-role badge-role-body">
@@ -600,7 +726,7 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                     >
                       <p className="preview-body">
                         Le nostre suite offrono comfort esclusivo con finiture
-                        artigianali e terrazzo privato.
+                        artigianali.
                       </p>
                       <span className="preview-caption">
                         Consigliato: 400 Regular / 500 Medium • font-size: 16px
@@ -608,8 +734,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                     </div>
                   </div>
                 </div>
-
-                {/* SNIPPET CSS / SCSS / TAILWIND */}
                 <div className="code-snippets-section">
                   <div className="snippet-header">
                     <h4>Snippet Design Tokens</h4>
@@ -619,28 +743,19 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                         className="btn-copy-code"
                         onClick={() =>
                           copyToClipboard(
-                            `:root {
-  --font-heading: '${typography.h1h2Font}', sans-serif;
-  --font-subheading: '${typography.subtitlesFont || typography.h1h2Font}', sans-serif;
-  --font-body: '${typography.bodyFont}', sans-serif;
-}`,
+                            `:root {\n  --font-heading: '${typography.h1h2Font}', sans-serif;\n  --font-subheading: '${typography.subtitlesFont || typography.h1h2Font}', sans-serif;\n  --font-body: '${typography.bodyFont}', sans-serif;\n}`,
                             "CSS Tokens copiati",
                           )
                         }
                       >
                         <Copy size={13} /> Copia :root CSS
                       </button>
-
                       <button
                         type="button"
                         className="btn-copy-code btn-copy-tailwind"
                         onClick={() =>
                           copyToClipboard(
-                            `fontFamily: {
-                                heading: ['${typography.h1h2Font}', 'sans-serif'],
-                                subheading: ['${typography.subtitlesFont || typography.h1h2Font}', 'sans-serif'],
-                                body: ['${typography.bodyFont}', 'sans-serif'],
-                              }`,
+                            `fontFamily: {\n  heading: ['${typography.h1h2Font}', 'sans-serif'],\n  subheading: ['${typography.subtitlesFont || typography.h1h2Font}', 'sans-serif'],\n  body: ['${typography.bodyFont}', 'sans-serif'],\n}`,
                             "Tailwind Config copiata",
                           )
                         }
@@ -649,14 +764,7 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                       </button>
                     </div>
                   </div>
-
-                  <pre className="code-box">
-                    {`:root {
-                      --font-heading: '${typography.h1h2Font}', sans-serif;
-                      --font-subheading: '${typography.subtitlesFont || typography.h1h2Font}', sans-serif;
-                      --font-body: '${typography.bodyFont}', sans-serif;
-                    }`}
-                  </pre>
+                  <pre className="code-box">{`:root {\n  --font-heading: '${typography.h1h2Font}', sans-serif;\n  --font-subheading: '${typography.subtitlesFont || typography.h1h2Font}', sans-serif;\n  --font-body: '${typography.bodyFont}', sans-serif;\n}`}</pre>
                 </div>
               </div>
             )}
@@ -671,7 +779,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                     appunti
                   </p>
                 </div>
-
                 <div className="colors-cards-grid">
                   {(config.colors || []).map((hex, index) => {
                     const textColor = getContrastColor(hex);
@@ -713,7 +820,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                     );
                   })}
                 </div>
-
                 <div className="code-snippets-section mt-4">
                   <div className="snippet-header">
                     <h4>Variabili Colori CSS</h4>
@@ -767,7 +873,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                     </div>
                   </div>
                 </div>
-
                 <div className="checklist-items">
                   <label className="check-item">
                     <input
@@ -783,7 +888,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                       </span>
                     </div>
                   </label>
-
                   <label className="check-item">
                     <input
                       type="checkbox"
@@ -798,7 +902,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                       </span>
                     </div>
                   </label>
-
                   <label className="check-item">
                     <input
                       type="checkbox"
@@ -815,7 +918,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                       </span>
                     </div>
                   </label>
-
                   <label className="check-item">
                     <input
                       type="checkbox"
@@ -830,7 +932,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                       </span>
                     </div>
                   </label>
-
                   <label className="check-item">
                     <input
                       type="checkbox"
@@ -845,7 +946,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                       </span>
                     </div>
                   </label>
-
                   <label className="check-item">
                     <input
                       type="checkbox"
@@ -861,8 +961,6 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                     </div>
                   </label>
                 </div>
-
-                {/* NOTE PERSONALIZZATE */}
                 {((currentDevSpec.pageNotes &&
                   currentDevSpec.pageNotes.length > 0) ||
                   (config.generalDevTips &&
@@ -883,6 +981,168 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
                 )}
               </div>
             )}
+
+            {/* TAB 5: SEZIONE SELEZIONATA (NUOVO) */}
+            {rightPanelTab === "section" && (
+              <div className="panel-section">
+                {!selectedSection ? (
+                  <div className="empty-state">
+                    <MousePointer size={48} className="text-muted mb-3" />
+                    <h4 className="text-muted">Nessuna sezione selezionata</h4>
+                    <p className="text-muted small">
+                      Clicca o trascina il mouse sull'immagine a sinistra per
+                      rilevare automaticamente la macro-sezione
+                    </p>
+                    <div className="selection-mode-toggle mt-4">
+                      <span className="small text-muted me-2">Modalità:</span>
+                      <button
+                        type="button"
+                        className={`btn-mode ${selectionMode === "click" ? "active" : ""}`}
+                        onClick={() => setSelectionMode("click")}
+                      >
+                        <MousePointer size={14} /> Click
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn-mode ${selectionMode === "drag" ? "active" : ""}`}
+                        onClick={() => setSelectionMode("drag")}
+                      >
+                        <Target size={14} /> Drag
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="section-details">
+                    <div className="section-header">
+                      <span
+                        className={`section-badge section-${selectedSection.id}`}
+                      >
+                        {selectedSection.name}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn-clear"
+                        onClick={() => setSelectedSection(null)}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+
+                    <div className="section-info-grid">
+                      <div className="info-item">
+                        <span className="info-label">Tag Semantico:</span>
+                        <code className="info-value">
+                          &lt;{selectedSection.tag}&gt;
+                        </code>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">Heading Tag:</span>
+                        <code className="info-value">
+                          {selectedSection.headingTag === "none"
+                            ? "Nessuno"
+                            : `<${selectedSection.headingTag}>`}
+                        </code>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">Font Ruolo:</span>
+                        <span className="info-value">
+                          {selectedSection.fontRole === "h1h2"
+                            ? "Titoli (H1/H2)"
+                            : selectedSection.fontRole === "subtitles"
+                              ? "Sottotitoli"
+                              : "Corpo testo"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="section-layout-note">
+                      <h5>Layout Consigliato:</h5>
+                      <p>{selectedSection.layoutNote}</p>
+                    </div>
+
+                    <div className="section-bootstrap-classes">
+                      <h5>Classi Bootstrap:</h5>
+                      <div style={{ position: "relative" }}>
+                        <code className="code-block">
+                          {selectedSection.bootstrapClasses}
+                        </code>
+                        <button
+                          type="button"
+                          className="btn-copy-small"
+                          onClick={() =>
+                            copyToClipboard(
+                              selectedSection.bootstrapClasses,
+                              "Classi copiate",
+                            )
+                          }
+                        >
+                          <Copy size={12} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="section-scss-imports">
+                      <h5>Import SCSS:</h5>
+                      <ul className="imports-list">
+                        {selectedSection.scssImports.map((imp, idx) => (
+                          <li key={idx} className="import-item">
+                            <code>{imp}</code>
+                            <button
+                              type="button"
+                              className="btn-copy-small"
+                              onClick={() =>
+                                copyToClipboard(imp, "Import copiato")
+                              }
+                            >
+                              <Copy size={12} />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="section-tech-note">
+                      <Sparkles
+                        size={14}
+                        className="text-warning flex-shrink-0"
+                      />
+                      <span>{selectedSection.techNote}</span>
+                    </div>
+
+                    <div className="section-code-snippet">
+                      <div className="snippet-header">
+                        <h5>
+                          <Code2 size={16} /> Codice HTML Consigliato
+                        </h5>
+                        <button
+                          type="button"
+                          className="btn-copy-code"
+                          onClick={() =>
+                            copyToClipboard(
+                              selectedSection.codeSnippet,
+                              "Codice copiato",
+                            )
+                          }
+                        >
+                          <Copy size={13} /> Copia Tutto
+                        </button>
+                      </div>
+                      <pre className="code-box">
+                        {selectedSection.codeSnippet}
+                      </pre>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            <button
+              type="button"
+              className={`tab-btn ${rightPanelTab === "section" ? "active" : ""}`}
+              onClick={() => setRightPanelTab("section")}
+            >
+              <MousePointer size={15} /> Sezione
+              {selectedSection && <span className="badge-active">●</span>}
+            </button>
           </div>
         </div>
       </div>
