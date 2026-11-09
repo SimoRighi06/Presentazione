@@ -8,10 +8,10 @@ import { InfoPopupCard } from "./components/Floating/InfoPopupCard";
 import { ConfigPanel } from "./components/ConfigPan/ConfigPanel";
 import { CreditsPopupCard } from "./components/Floating/CreditCanvasCard";
 import { IndependentCustomCard } from "./components/Floating/CustomFloatingCard";
-import { type AppConfig, DEFAULT_CONFIG } from "./types/config";
 import { AdminLoginGate } from "./components/Login/AdminLoginGate";
 import { useAppRouter, getSiteParamFromDomain } from "./hooks/useAppRouting";
-import { useClientView, isClientView } from "./clientLink";
+import { useClientView, isClientView, extractClientSlug } from "./clientLink";
+import { useAppConfig } from "./hooks/useAppConfig";
 
 const PresentationViewer = lazy(
   () => import("./components/Presentation/PresentationViewer"),
@@ -22,6 +22,8 @@ const presentationLoading = (
     <Loader2 size={48} className="text-secondary animate-spin" />
   </div>
 );
+
+const DevModeViewer = lazy(() => import("./components/DevMode/DevModeViewer"));
 
 export default function App() {
   const {
@@ -38,7 +40,11 @@ export default function App() {
   const [draftUrl, setDraftUrl] = useState("bozza01");
   const isInteractive = true;
   const [isFocusedOnDraft, setIsFocusedOnDraft] = useState(false);
-  const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
+  const {
+    config,
+    setConfig,
+    isLoading: isConfigLoading,
+  } = useAppConfig(setSiteParam, getSiteParamFromDomain);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem("admin_authenticated") === "true";
@@ -52,60 +58,21 @@ export default function App() {
     config.navItems?.[0]?.id || "home",
   );
 
-  // Caricamento config
+  // Sincronizza activeTab e draftUrl quando viene caricata o modificata la configurazione
   useEffect(() => {
-    const loadConfigFromQuery = () => {
-      const params = new URLSearchParams(window.location.search);
-      const encodedData = params.get("data");
-
-      if (!encodedData) {
-        return false;
-      }
-
-      try {
-        const decodedString = decodeURIComponent(
-          escape(atob(encodedData)),
-        );
-
-        const parsedConfig = JSON.parse(decodedString) as AppConfig;
-
-        setConfig(parsedConfig);
-
-        if (parsedConfig.dominio) {
-          setSiteParam(getSiteParamFromDomain(parsedConfig.dominio));
+    if (config.navItems && config.navItems.length > 0) {
+      const firstItem = config.navItems[0];
+      if (!activeTab || !config.navItems.some((item) => item.id === activeTab)) {
+        setActiveTab(firstItem.id);
+        if (firstItem.draftUrl) {
+          setDraftUrl(firstItem.draftUrl);
         }
-
-        return true;
-      } catch (error) {
-        console.warn("Parametri config invalidi, fallback a config.json", error);
-        return false;
       }
-    };
-
-    const loadConfigFromFile = async () => {
-      try {
-        const res = await fetch("/config.json");
-        if (!res.ok) throw new Error("config.json non trovato");
-
-        const data = (await res.json()) as AppConfig;
-
-        setConfig(data);
-
-        if (data.dominio) {
-          setSiteParam(getSiteParamFromDomain(data.dominio));
-        }
-      } catch {
-        setConfig(DEFAULT_CONFIG);
-        setSiteParam(getSiteParamFromDomain(DEFAULT_CONFIG.dominio));
-      }
-    };
-
-    const fromQuery = loadConfigFromQuery();
-
-    if (!fromQuery) {
-      void loadConfigFromFile();
     }
+  }, [config.navItems, activeTab]);
 
+  // Scorciatoia da tastiera per apertura Login Admin
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isClientView()) return;
       if (
@@ -119,9 +86,10 @@ export default function App() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [setSiteParam]);
+  }, []);
 
-  const isImage = !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
+  const isImage =
+    !draftUrl.startsWith("http://") && !draftUrl.startsWith("https://");
   useEffect(() => {
     if (!config.navItems || config.navItems.length === 0) return;
 
@@ -229,7 +197,7 @@ export default function App() {
     }
   };
 
-  // Entrata della pagina 
+  // Entrata della pagina
   useEffect(() => {
     if (isConfigMode || viewMode !== "draft" || !containerRef.current) return;
 
@@ -253,7 +221,7 @@ export default function App() {
     return () => ctx.revert();
   }, [isConfigMode, viewMode]);
 
-  // handle del mouse 
+  // handle del mouse
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!stageRef.current) return;
     const rect = stageRef.current.getBoundingClientRect();
@@ -286,6 +254,18 @@ export default function App() {
       ease: "power3.out",
     });
   };
+
+  // Visualizza loader mentre si scarica la configurazione del cliente
+  if (isConfigLoading && extractClientSlug()) {
+    return (
+      <div
+        className="cloud-viewport d-flex align-items-center justify-content-center"
+        style={{ minHeight: "100vh" }}
+      >
+        <Loader2 size={48} className="text-secondary animate-spin" />
+      </div>
+    );
+  }
 
   // Login
   const needsLogin = (isConfigMode || showAdminLogin) && !isAuthenticated;
@@ -370,6 +350,31 @@ export default function App() {
           onOpenAdmin={() => {
             setViewMode("admin");
             setIsConfigMode(true);
+          }}
+        />
+      </Suspense>
+    );
+  }
+
+  // Modalità Sviluppatore (DevMode)
+  if (viewMode === "dev") {
+    return (
+      <Suspense fallback={presentationLoading}>
+        <DevModeViewer
+          config={config}
+          siteParam={siteParam}
+          activeTab={activeTab}
+          currentDraft={draftUrl}
+          onSelectTab={(item) => {
+            setActiveTab(item.id);
+            if (item.draftUrl) handleUrlChange(item.draftUrl);
+          }}
+          onCloseDev={() => {
+            setViewMode("draft");
+            const url = new URL(window.location.href);
+            url.pathname = url.pathname.replace(/\/devmode/i, "");
+            url.searchParams.delete("mode");
+            window.history.replaceState({}, "", url.toString());
           }}
         />
       </Suspense>
@@ -495,7 +500,7 @@ export default function App() {
               style={{ fontSize: "inherit" }}
             >
               <Type size={16} />
-               <p className="d-none d-md-flex m-0">Font Utilizzati</p>
+              <p className="d-none d-md-flex m-0">Font Utilizzati</p>
             </div>
             <ul className="list-unstyled mb-0 ms-1 d-flex text-start ps-4 flex-column gap-2 mt-3">
               {config.fonts?.map((font, index) => (

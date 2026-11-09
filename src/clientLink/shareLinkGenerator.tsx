@@ -1,71 +1,82 @@
 import React, { useState } from "react";
-import { Copy, Check, Link as LinkIcon } from "lucide-react";
-import { getSiteParamFromDomain } from "../hooks/useAppRouting";
-import type { AppConfig } from "../types/config";
+import { Copy, Check, ExternalLink} from "lucide-react";
 
 interface ShareLinkGeneratorProps {
-  siteParam: string;
-  config: AppConfig;
+  siteParam: string; // Questo è il "dominio" / slug (es. "hoteltorbole")
 }
 
-export const ShareLinkGenerator: React.FC<ShareLinkGeneratorProps> = ({
-  siteParam,
-  config,
-}) => {
+export const ShareLinkGenerator: React.FC<ShareLinkGeneratorProps> = ({ siteParam }) => {
   const [copied, setCopied] = useState(false);
 
-  const getClientUrl = () => {
-    const activeSiteParam =
-      siteParam && siteParam.trim()
-        ? getSiteParamFromDomain(siteParam)
-        : getSiteParamFromDomain(config.dominio);
+  // 1. Puliamo lo slug: lowercase e senza spazi
+  const cleanSlug = siteParam ? siteParam.toLowerCase().replace(/\s+/g, "") : "";
+  
+  // 2. Costruiamo l'URL pulito usando l'origine corrente 
+  // (Funziona automaticamente sia su localhost:5173 che sul tuo dominio di produzione)
+  const shareUrl = cleanSlug ? `${window.location.origin}/${cleanSlug}` : "";
 
-    const serializedConfig = JSON.stringify(config);
-    const encodedString = btoa(
-      unescape(encodeURIComponent(serializedConfig)),
-    );
-
-    return `${window.location.origin}/v/${activeSiteParam}?data=${encodedString}`;
-  };
-
+  // 3. Funzione per copiare negli appunti
   const handleCopy = async () => {
+    if (!shareUrl) return;
     try {
-      const clientUrl = getClientUrl();
-      await navigator.clipboard.writeText(clientUrl);
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2000); // Reset dopo 2 secondi
     } catch (err) {
       console.error("Errore nella copia del link:", err);
-      alert("Impossibile copiare il link. Copia manualmente la URL.");
     }
   };
 
-  const clientUrl = getClientUrl();
+  const apriLink = async () => {
+    if (!shareUrl) return;
+    window.open(shareUrl);
+  }
+
+  // Se non c'è uno slug, mostriamo un avviso
+  if (!cleanSlug) {
+    return (
+      <div className="alert alert-warning small text-center mt-3 mb-0">
+        ⚠️ Inserisci un "Nome Dominio" valido sopra per generare il link.
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4 bg-light rounded-3 border mt-4">
-      <div className="d-flex align-items-center gap-2 mb-3">
-        <LinkIcon size={20} className="text-primary" />
-        <h5 className="mb-0 fw-bold">Link per il Cliente</h5>
-      </div>
-
-      <div className="d-flex gap-2">
-        <input
-          type="text"
-          className="form-control bg-white"
-          value={clientUrl}
-          readOnly
-          style={{ fontSize: "0.9rem" }}
-        />
+    <div className="mt-4 p-3 bg-light rounded-3 border">
+      <label className="form-label text-uppercase fs-7 fw-bold text-muted mb-2">
+        Link di Condivisione (Pubblico)
+      </label>
+      
+      <div className="input-group">
         <button
+          className={`btn d-flex align-items-center gap-2 ${copied ? "btn-success" : "btn-dark"}`}
+          type="button"
           onClick={handleCopy}
-          className={`btn ${copied ? "btn-success" : "btn-primary"} d-flex align-items-center gap-2`}
-          style={{ minWidth: "100px", justifyContent: "center" }}
+          title="Copia link"
         >
-          {copied ? <Check size={18} /> : <Copy size={18} />}
+          {copied ? <Check size={16} /> : <Copy size={16} />}
           {copied ? "Copiato!" : "Copia"}
         </button>
+        <input
+          type="text"
+          className="form-control bg-white border-0 font-monospace small text-truncate"
+          value={shareUrl}
+          readOnly
+          title={shareUrl}
+        />
+        <button
+          className="btn d-flex align-items-center btn-success"
+          type="button"
+          onClick={apriLink}
+        >
+          <ExternalLink size={18}></ExternalLink>
+        </button>
+        
       </div>
+      
+      <small className="text-muted mt-2 d-block" style={{ fontSize: "0.75rem" }}>
+
+      </small>
     </div>
   );
 };
