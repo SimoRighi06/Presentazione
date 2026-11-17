@@ -2,7 +2,7 @@
 import React from "react";
 import type { DevPageSpec } from "../../../types/config";
 
-interface NotesPanelProps {
+export interface NotesPanelProps {
   checkProgress: number;
   checkedItems: Record<string, boolean>;
   onToggleCheck: (id: string) => void;

@@ -62,7 +62,10 @@ export default function App() {
   useEffect(() => {
     if (config.navItems && config.navItems.length > 0) {
       const firstItem = config.navItems[0];
-      if (!activeTab || !config.navItems.some((item) => item.id === activeTab)) {
+      if (
+        !activeTab ||
+        !config.navItems.some((item) => item.id === activeTab)
+      ) {
         setActiveTab(firstItem.id);
         if (firstItem.draftUrl) {
           setDraftUrl(firstItem.draftUrl);
