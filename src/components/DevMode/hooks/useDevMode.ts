@@ -1,17 +1,12 @@
 // components/DevMode/hooks/useDevMode.ts
-import { useState, useEffect } from "react";
-import type { AppConfig, /* NavItem */ } from "../../../types/config";
+import { useState, useEffect, useCallback } from "react";
+import type { AppConfig, DevPageSpec } from "../../../types/config";
 import { DEFAULT_DEV_SPEC } from "../../../types/config";
 import {
   SECTION_TEMPLATES,
   SECTION_HEIGHT_RANGES,
   type SectionTemplate,
 } from "../../../types/config";
-import {
-  copyToClipboard,
-  getTypography,
-  generateMarkdown,
-} from "../utils/devModeHelpers";
 
 export type RightPanelTab =
   | "seo"
@@ -34,65 +29,13 @@ interface DragStart {
   y: number;
 }
 
-interface DevModeState {
-  // Toolbar
-  showGrid: boolean;
-  setShowGrid: React.Dispatch<React.SetStateAction<boolean>>;
-  showFold: boolean;
-  setShowFold: React.Dispatch<React.SetStateAction<boolean>>;
-  zoomMode: ZoomMode;
-  setZoomMode: React.Dispatch<React.SetStateAction<ZoomMode>>;
-  rightPanelTab: RightPanelTab;
-  setRightPanelTab: React.Dispatch<React.SetStateAction<RightPanelTab>>;
-
-  // Feedback
-  copyFeedback: string | null;
-  copyToClipboard: (text: string, label: string) => void;
-
-  // Checklist
-  checkedItems: Record<string, boolean>;
-  toggleCheckItem: (id: string) => void;
-  checkProgress: number;
-
-  // Immagine
-  imgSrc: string;
-  setImgSrc: React.Dispatch<React.SetStateAction<string>>;
-  isImgLoading: boolean;
-  setIsImgLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  imgErrorStep: number;
-  setImgErrorStep: React.Dispatch<React.SetStateAction<number>>;
-  isExternalUrl: boolean;
-
-  // Selezione sezione
-  selectedSection: SectionTemplate | null;
-  setSelectedSection: React.Dispatch<
-    React.SetStateAction<SectionTemplate | null>
-  >;
-  selectionMode: SelectionMode;
-  setSelectionMode: React.Dispatch<React.SetStateAction<SelectionMode>>;
-  selectionBox: SelectionBox | null;
-  isDragging: boolean;
-  dragStart: DragStart | null;
-  handleImageClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleDragStart: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleDragMove: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleDragEnd: (e: React.MouseEvent<HTMLDivElement>) => void;
-
-  // Derived data
-  currentDevSpec: AppConfig["devSpecs"] extends Record<string, infer T>
-    ? T
-    : any;
-  typography: ReturnType<typeof getTypography>;
-  generateMarkdown: () => void;
-}
-
 export const useDevMode = (
   config: AppConfig,
   siteParam: string,
   activeTab: string,
   currentDraftProp?: string,
   draftUrlProp?: string,
-): DevModeState => {
+) => {
   const currentDraft =
     currentDraftProp ||
     (draftUrlProp && !draftUrlProp.includes("/") ? draftUrlProp : activeTab);
@@ -105,8 +48,11 @@ export const useDevMode = (
 
   // Feedback
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
-  const handleCopy = (text: string, label: string) =>
-    copyToClipboard(text, label, setCopyFeedback);
+  const copyToClipboard = useCallback((text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopyFeedback(label);
+    setTimeout(() => setCopyFeedback(null), 2500);
+  }, []);
 
   // Checklist
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({
@@ -120,7 +66,6 @@ export const useDevMode = (
   });
   const toggleCheckItem = (id: string) =>
     setCheckedItems((prev) => ({ ...prev, [id]: !prev[id] }));
-
   const totalChecks = Object.keys(checkedItems).length;
   const completedChecks = Object.values(checkedItems).filter(Boolean).length;
   const checkProgress = Math.round((completedChecks / totalChecks) * 100);
@@ -141,7 +86,7 @@ export const useDevMode = (
     return `/bozze-proxy/${siteParam}/images/${currentDraft}.webp`;
   };
 
-  const [imgSrc, setImgSrc] = useState<string>(getInitialImgSrc);
+  const [imgSrc, setImgSrc] = useState<string>(getInitialImgSrc());
   const [isImgLoading, setIsImgLoading] = useState(true);
   const [imgErrorStep, setImgErrorStep] = useState<number>(0);
 
@@ -157,7 +102,7 @@ export const useDevMode = (
     setImgErrorStep(0);
   }, [siteParam, currentDraft, draftUrlProp, isExternalUrl]);
 
-  /* const handleImgError = () => {
+  const handleImgError = useCallback(() => {
     if (imgErrorStep === 0) {
       console.log(
         `[DevMode] WebP non trovato per ${currentDraft}, provo JPG...`,
@@ -182,7 +127,7 @@ export const useDevMode = (
     setImgSrc(
       `https://placehold.co/1920x1080/12161f/ffffff?text=Bozza+non+trovata+(${currentDraft}+su+${siteParam})`,
     );
-  }; */
+  }, [imgErrorStep, siteParam, currentDraft]);
 
   // Selezione sezione
   const [selectedSection, setSelectedSection] =
@@ -242,13 +187,83 @@ export const useDevMode = (
   };
 
   // Derived data
-  const currentDevSpec = config.devSpecs?.[activeTab] || DEFAULT_DEV_SPEC;
-  const typography = getTypography(config);
+  const currentDevSpec: DevPageSpec =
+    config.devSpecs?.[activeTab] || DEFAULT_DEV_SPEC;
+  const rawFonts = config.fonts || ["Tosh A", "Mokoko", "Acumin Pro"];
+  const typography = config.typographyAssignment || {
+    h1h2Font: rawFonts[0] || "Sans-serif",
+    subtitlesFont: rawFonts[1] || rawFonts[0] || "Sans-serif",
+    bodyFont: rawFonts[2] || rawFonts[0] || "Sans-serif",
+  };
 
-  const handleGenerateMarkdown = () =>
-    generateMarkdown(config, siteParam, activeTab, typography, handleCopy);
+  const getContrastColor = (hex: string): string => {
+    const clean = hex.replace("#", "");
+    if (clean.length !== 6) return "#ffffff";
+    const r = parseInt(clean.substring(0, 2), 16);
+    const g = parseInt(clean.substring(2, 4), 16);
+    const b = parseInt(clean.substring(4, 6), 16);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? "#000000" : "#ffffff";
+  };
+
+  const generateMarkdown = () => {
+    const colorsCss = (config.colors || [])
+      .map((hex, index) => `--color-${index + 1}: ${hex};`)
+      .join("\n");
+    const md = `# 🚀 Specifiche Tecniche Frontend: ${config.dominio || siteParam}
+
+Data generazione: ${new Date().toLocaleDateString("it-IT")}
+
+## 🎨 1. Design System & Tipografia
+
+\`\`\`css
+:root {
+  --font-heading: '${typography.h1h2Font}', sans-serif;
+  --font-subheading: '${typography.subtitlesFont || typography.h1h2Font}', sans-serif;
+  --font-body: '${typography.bodyFont}', sans-serif;
+  ${colorsCss}
+}
+\`\`\`
+
+## 🏗️ 2. Struttura Layout & Albero SEO (Pagina: ${activeTab})
+
+${currentDevSpec.seoSections
+  .map(
+    (sec) => `
+### \`${sec.tag}\` ${sec.headingTag && sec.headingTag !== "none" ? `→ <${sec.headingTag.toUpperCase()}>` : ""}
+- **Testo SEO**: ${sec.headingText || "N/A"}
+- **Font Ruolo**: ${sec.assignedFontRole === "h1h2" ? `Titoli (${typography.h1h2Font})` : sec.assignedFontRole === "subtitles" ? `Sottotitoli (${typography.subtitlesFont})` : `Corpo (${typography.bodyFont})`}
+- **Layout**: ${sec.layoutNote || "Container standard"}
+- **Note Tecniche**: ${sec.techNote || "Nessuna"}
+`,
+  )
+  .join("\n---\n")}
+
+## ✅ 3. Checklist Sviluppo
+
+- [x] Un solo tag H1 semantico per pagina
+- [ ] Convertire immagini in .webp (< 200KB)
+- [ ] Attributi alt descrittivi su ogni <img>
+- [ ] Contrasto WCAG AA minimo 4.5:1
+- [ ] Schema.org JSON-LD (LocalBusiness / Hotel)
+
+${(currentDevSpec.pageNotes || []).map((n) => `- [ ] ${n}`).join("\n")}
+${(config.generalDevTips || []).map((t) => `- [ ] ${t}`).join("\n")}
+
+*Generato da Tecnoprogress Hub X-Ray DevMode Workbench*`;
+    copyToClipboard(md, "Markdown SPEC.md copiato");
+  };
 
   return {
+    currentDraft,
+    isExternalUrl,
+    imgSrc,
+    setImgSrc,
+    isImgLoading,
+    setIsImgLoading,
+    imgErrorStep,
+    setImgErrorStep,
+    handleImgError,
     showGrid,
     setShowGrid,
     showFold,
@@ -258,17 +273,14 @@ export const useDevMode = (
     rightPanelTab,
     setRightPanelTab,
     copyFeedback,
-    copyToClipboard: handleCopy,
+    copyToClipboard,
     checkedItems,
     toggleCheckItem,
     checkProgress,
-    imgSrc,
-    setImgSrc,
-    isImgLoading,
-    setIsImgLoading,
-    imgErrorStep,
-    setImgErrorStep,
-    isExternalUrl,
+    currentDevSpec,
+    typography,
+    getContrastColor,
+    generateMarkdown,
     selectedSection,
     setSelectedSection,
     selectionMode,
@@ -280,8 +292,5 @@ export const useDevMode = (
     handleDragStart,
     handleDragMove,
     handleDragEnd,
-    currentDevSpec,
-    typography,
-    generateMarkdown: handleGenerateMarkdown,
   };
 };

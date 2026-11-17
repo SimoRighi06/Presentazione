@@ -2,22 +2,22 @@
 import React from "react";
 import { Layers, Type, Palette, CheckSquare, MousePointer } from "lucide-react";
 import type { RightPanelTab } from "./hooks/useDevMode";
-import { SeoPanel } from "./panels/SeoPanel";
-import { TypographyPanel } from "./panels/TypographyPanel";
-import { ColorsPanel } from "./panels/ColorsPanel";
-import { NotesPanel } from "./panels/NotesPanel";
-import { SectionPanel } from "./panels/SectionPanel";
+import { SeoPanel, type SeoPanelProps } from "./panels/SeoPanel";
+import { TypographyPanel, type TypographyPanelProps } from "./panels/TypographyPanel";
+import { ColorsPanel, type ColorsPanelProps } from "./panels/ColorsPanel";
+import { NotesPanel, type NotesPanelProps } from "./panels/NotesPanel";
+import { SectionPanel, type SectionPanelProps } from "./panels/SectionPanel"; 
 
 interface DevModeConsoleProps {
   rightPanelTab: RightPanelTab;
   onTabChange: (tab: RightPanelTab) => void;
   hasSelectedSection: boolean;
   // Props pass-through per i panel
-  seoProps: any;
-  typoProps: any;
-  colorsProps: any;
-  notesProps: any;
-  sectionProps: any;
+  seoProps: SeoPanelProps;
+  typoProps: TypographyPanelProps;
+  colorsProps?: ColorsPanelProps;
+  notesProps: NotesPanelProps;
+  sectionProps: SectionPanelProps;
 }
 
 const TABS: { id: RightPanelTab; label: string; icon: React.ElementType }[] = [
@@ -27,6 +27,7 @@ const TABS: { id: RightPanelTab; label: string; icon: React.ElementType }[] = [
   { id: "notes", label: "Best Practice", icon: CheckSquare },
   { id: "section", label: "Sezione", icon: MousePointer },
 ];
+
 
 export const DevModeConsole: React.FC<DevModeConsoleProps> = ({
   rightPanelTab, onTabChange, hasSelectedSection,
@@ -49,7 +50,7 @@ export const DevModeConsole: React.FC<DevModeConsoleProps> = ({
     <div className="console-content">
       {rightPanelTab === "seo" && <SeoPanel {...seoProps} />}
       {rightPanelTab === "typography" && <TypographyPanel {...typoProps} />}
-      {rightPanelTab === "colors" && <ColorsPanel {...colorsProps} />}
+      {/* {rightPanelTab === "colors" && <ColorsPanel {...colorsProps} />} */}
       {rightPanelTab === "notes" && <NotesPanel {...notesProps} />}
       {rightPanelTab === "section" && <SectionPanel {...sectionProps} />}
     </div>

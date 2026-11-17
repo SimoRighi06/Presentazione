@@ -3,7 +3,7 @@ import React from "react";
 import { Copy } from "lucide-react";
 import type { TypographyAssignment } from "../../../types/config";
 
-interface TypographyPanelProps {
+export interface TypographyPanelProps {
   typography: TypographyAssignment;
   onCopy: (text: string, label: string) => void;
 }

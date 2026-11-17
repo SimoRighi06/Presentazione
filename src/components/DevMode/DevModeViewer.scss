@@ -1167,3 +1167,34 @@ IMAGE SELECTION & SECTION PANEL (NUOVO)
     color: #fff;
   }
 }
+
+
+.ai-analyzing-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(168, 85, 247, 0.9);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 36;
+  animation: pulse 2s infinite;
+}
+
+.ai-error-banner {
+  padding: 0.75rem;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.08);
+  border-left: 3px solid #ef4444;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  color: #f87171;
+  line-height: 1.4;
+}

@@ -1,4 +1,4 @@
-// components/DevMode/utils/devModeHelpers.ts
+/* // components/DevMode/utils/devModeHelpers.ts
 import type { AppConfig, TypographyAssignment } from "../../../types/config";
 
 export const copyToClipboard = (text: string, label: string, onFeedback: (msg: string) => void) => {
@@ -47,19 +47,14 @@ export const generateMarkdown = (
 
 Data generazione: ${new Date().toLocaleDateString("it-IT")}
 
-## 🎨 1. Design System & Tipografia
-
-\`\`\`css
 :root {
-  /* Tipografia */
+
   --font-heading: '${typography.h1h2Font}', sans-serif;
   --font-subheading: '${typography.subtitlesFont || typography.h1h2Font}', sans-serif;
   --font-body: '${typography.bodyFont}', sans-serif;
 
-  /* Palette Colori */
   ${colorsCss}
 }
-\`\`\`
 
 ## 🏗️ 2. Struttura Layout & Albero SEO (Pagina: ${activeTab})
 
@@ -92,4 +87,22 @@ ${(config.generalDevTips || []).map((tip) => `- [ ] ${tip}`).join("\n")}
 `;
 
   onCopy(md, "Markdown SPEC.md copiato");
+}; */
+
+
+
+
+
+// components/DevMode/utils/devModeHelpers.ts
+import type { AppConfig, TypographyAssignment } from "../../../types/config";
+
+export const getTypography = (
+  config: AppConfig,
+): TypographyAssignment => {
+  const rawFonts = config.fonts || ["Tosh A", "Mokoko", "Acumin Pro"];
+  return config.typographyAssignment || {
+    h1h2Font: rawFonts[0] || "Sans-serif",
+    subtitlesFont: rawFonts[1] || rawFonts[0] || "Sans-serif",
+    bodyFont: rawFonts[2] || rawFonts[0] || "Sans-serif",
+  };
 };

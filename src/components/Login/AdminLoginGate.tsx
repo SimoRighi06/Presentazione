@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Lock, Eye, EyeOff, AlertCircle, Timer } from "lucide-react";
 
-{/* const PASSWORD_BASE64 = "UHJlc2VudGF6aW9uZTI2IQ=="; */}
+{
+  /* const PASSWORD_BASE64 = "UHJlc2VudGF6aW9uZTI2IQ=="; */
+}
 
 export interface AdminLoginGateProps {
   onSuccess: () => void;
@@ -35,7 +37,10 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
     if (!lockoutUntil) return;
 
     const interval = setInterval(() => {
-      const remaining = Math.max(0, Math.ceil((lockoutUntil - Date.now()) / 1000));
+      const remaining = Math.max(
+        0,
+        Math.ceil((lockoutUntil - Date.now()) / 1000),
+      );
       setTimeLeft(remaining);
 
       if (remaining === 0) {
@@ -55,10 +60,11 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
   };
 
   // Chiamata al Backend .NET
+  // Sostituisci TUTTA la funzione handleSubmit in AdminLoginGate.tsx
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
+
     if (lockoutUntil !== null || isLoading) return;
     if (!username.trim() || !password.trim()) {
       setError("Inserisci username e password");
@@ -74,33 +80,40 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        // Login riuscito: salva il JWT e accedi
+        // ✅ SUCCESSO: Solo qui salviamo i dati e chiamiamo onSuccess
+        const data = await response.json();
+        sessionStorage.setItem("admin_authenticated", "true");
+        sessionStorage.setItem("token", data.token);
         sessionStorage.setItem("admin_token", data.token);
-        sessionStorage.setItem("admin_username", data.username);
+        sessionStorage.setItem("admin_username", data.username || username);
+
+        setFailedAttempts(0); // Resetta i tentativi al successo
         onSuccess();
       } else {
-        // Login fallito: gestisci tentativi e lockout
+        // ❌ FALLIMENTO: Gestisci l'errore
         const newAttempts = failedAttempts + 1;
         setFailedAttempts(newAttempts);
+
+        let errorMsg = "Credenziali non valide";
+        try {
+          const errData = await response.json();
+          errorMsg = errData.message || errData.error || errorMsg;
+        } catch {
+          // Ignora errori di parsing JSON se la risposta non è JSON
+        }
 
         if (newAttempts >= 4) {
           const lockTime = Date.now() + 30000;
           setLockoutUntil(lockTime);
-          setTimeLeft(60);
+          setTimeLeft(30);
           setError("Troppi tentativi. Riprova tra 30 secondi.");
         } else {
-          setError(data.message || "Credenziali non valide");
+          setError(errorMsg);
         }
 
         setPassword("");
         triggerShake();
-      }
-      if(response.status === 401 ){
-        sessionStorage.removeItem("admin_token");
-        window.location.reload();
       }
     } catch {
       setError("Errore di connessione al server");
@@ -117,8 +130,6 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
     sessionStorage.removeItem("admin_username");
     onCancel();
   };
-
-  
 
   return (
     <div
@@ -211,7 +222,9 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
           {/* Bottone Accedi */}
           <button
             type="submit"
-            disabled={isLocked || !username.trim() || !password.trim() || isLoading}
+            disabled={
+              isLocked || !username.trim() || !password.trim() || isLoading
+            }
             className="btn btn-dark w-100 rounded-pill py-2 fw-semibold"
             style={{
               opacity: isLocked || isLoading ? 0.5 : 1,
@@ -220,7 +233,10 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({
           >
             {isLoading ? (
               <span className="d-flex align-items-center justify-content-center gap-2">
-                <span className="spinner-border spinner-border-sm" role="status"></span>
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                ></span>
                 Verifica...
               </span>
             ) : isLocked ? (
