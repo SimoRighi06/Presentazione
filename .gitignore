@@ -28,6 +28,7 @@ backend/Properties/launchSettings.json
 backend/*.user
 backend/*.vspscc
 backend/*.sln.docstates
+backend/appsettings.json
 tryPy/
 
 # Editor directories and files
