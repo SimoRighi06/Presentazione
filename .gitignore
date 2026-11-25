@@ -11,7 +11,23 @@ node_modules
 dist
 dist-ssr
 *.local
-backend/
+# Backend – exclude build artefacts, secrets and local DB
+backend/bin/
+backend/obj/
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+backend/*.log
+backend/*.pdb
+backend/*.exe
+backend/*.dll
+backend/appsettings.Development.json
+backend/appsettings.*.json
+backend/secrets.json
+backend/Properties/launchSettings.json
+backend/*.user
+backend/*.vspscc
+backend/*.sln.docstates
 tryPy/
 
 # Editor directories and files

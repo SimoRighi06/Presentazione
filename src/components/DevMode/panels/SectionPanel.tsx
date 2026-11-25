@@ -74,6 +74,7 @@ export const SectionPanel: React.FC<SectionPanelProps> = ({
 
   // 3. Render principale con integrazione AI
   return (
+    
     <div className="panel-section">
       <div className="section-details">
         <div className="section-header">
@@ -98,6 +99,16 @@ export const SectionPanel: React.FC<SectionPanelProps> = ({
             <span>AI non disponibile: {aiResult.error}. Uso template statico.</span>
           </div>
         )}
+
+        <div className="section-code-snippet">
+          <div className="snippet-header">
+            <h5><Code2 size={16} /> Codice HTML Consigliato</h5>
+            <button type="button" className="btn-copy-code" onClick={() => onCopy(codeSnippet, "Codice copiato")}>
+              <Copy size={13} /> Copia Tutto
+            </button>
+          </div>
+          <pre className="code-box">{codeSnippet}</pre>
+        </div>
 
         <div className="section-info-grid">
           <div className="info-item">
@@ -153,15 +164,7 @@ export const SectionPanel: React.FC<SectionPanelProps> = ({
           </ul>
         </div>
 
-        <div className="section-code-snippet">
-          <div className="snippet-header">
-            <h5><Code2 size={16} /> Codice HTML Consigliato</h5>
-            <button type="button" className="btn-copy-code" onClick={() => onCopy(codeSnippet, "Codice copiato")}>
-              <Copy size={13} /> Copia Tutto
-            </button>
-          </div>
-          <pre className="code-box">{codeSnippet}</pre>
-        </div>
+        
       </div>
     </div>
   );
