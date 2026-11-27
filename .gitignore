@@ -30,6 +30,8 @@ backend/*.vspscc
 backend/*.sln.docstates
 backend/appsettings.json
 tryPy/
+backend/Presentazione.Api/bin/
+backend/Presentazione.Api/obj/
 
 # Editor directories and files
 .vscode/*
@@ -43,4 +45,4 @@ tryPy/
 *.sw?
 .vercel
 .env
-.VITE_env
+.VITE_env 
