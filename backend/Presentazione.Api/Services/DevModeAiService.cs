@@ -60,7 +60,7 @@ public class DevModeAiService : IDevModeAiService
             try
             {
                 var imageBytes = await _httpClient.GetByteArrayAsync(imageUrl);
-                Console.WriteLine($"✅ IMMAGINE SCARICATA: {imageUrl}");
+                Console.WriteLine($"IMMAGINE SCARICATA: {imageUrl}");
                 return imageBytes;
             }
             catch (HttpRequestException) { continue; }
@@ -87,7 +87,7 @@ public class DevModeAiService : IDevModeAiService
         using var ms = new MemoryStream();
         image.Save(ms, new JpegEncoder { Quality = jpegQuality });
         var optimized = ms.ToArray();
-        Console.WriteLine($"📦 [Optimize] {originalBytes.Length / 1024}KB -> {optimized.Length / 1024}KB");
+        Console.WriteLine($"[Optimize] {originalBytes.Length / 1024}KB -> {optimized.Length / 1024}KB");
         return optimized;
     }
 
@@ -166,7 +166,7 @@ public class DevModeAiService : IDevModeAiService
 
         foreach (var model in candidateModels)
         {
-            Console.WriteLine($"🔄 [AI] Provo modello: {model}");
+            Console.WriteLine($"[AI] Provo modello: {model}");
 
             var payload = new
             {
@@ -207,7 +207,7 @@ public class DevModeAiService : IDevModeAiService
             if (!response.IsSuccessStatusCode)
             {
                 var errBody = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"⚠️ [{model}] HTTP {(int)response.StatusCode}. Prossimo...");
+                Console.WriteLine($"[{model}] HTTP {(int)response.StatusCode}. Prossimo...");
                 lastError = new DevModeAnalysisResponse
                 {
                     Error = $"Modello {model} fallito ({response.StatusCode})",
@@ -221,7 +221,7 @@ public class DevModeAiService : IDevModeAiService
             var rawContent = result?.Candidates?.FirstOrDefault()?.Content?.Parts?
                 .FirstOrDefault(p => !string.IsNullOrEmpty(p.Text))?.Text ?? "{}";
 
-            Console.WriteLine($"✅ [{model}] Risposta ricevuta ({rawContent.Length} chars). Parsing...");
+            Console.WriteLine($" [{model}] Risposta ricevuta ({rawContent.Length} chars). Parsing...");
 
             // ✅ PARSING ROBUSTO
             var cleanJson = ExtractJson(rawContent);
@@ -231,15 +231,15 @@ public class DevModeAiService : IDevModeAiService
                 var parsed = JsonSerializer.Deserialize<DevModeAnalysisResponse>(cleanJson, JsonOptions);
                 if (parsed != null)
                 {
-                    Console.WriteLine($"🎉 [AI] SUCCESSO con modello {model}!");
+                    Console.WriteLine($" [AI] SUCCESSO con modello {model}!");
                     return parsed;
                 }
                 throw new JsonException("Deserialization returned null");
             }
             catch (JsonException ex)
             {
-                Console.WriteLine($"❌ JSON invalido: {ex.Message}");
-                Console.WriteLine($"📄 Contenuto grezzo: {cleanJson.Substring(0, Math.Min(500, cleanJson.Length))}");
+                Console.WriteLine($" JSON invalido: {ex.Message}");
+                Console.WriteLine($" Contenuto grezzo: {cleanJson.Substring(0, Math.Min(500, cleanJson.Length))}");
                 return new DevModeAnalysisResponse
                 {
                     Error = $"JSON malformato: {ex.Message}",
