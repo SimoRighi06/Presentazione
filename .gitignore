@@ -11,6 +11,27 @@ node_modules
 dist
 dist-ssr
 *.local
+# Backend – exclude build artefacts, secrets and local DB
+backend/bin/
+backend/obj/
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+backend/*.log
+backend/*.pdb
+backend/*.exe
+backend/*.dll
+backend/appsettings.Development.json
+backend/appsettings.*.json
+backend/secrets.json
+backend/Properties/launchSettings.json
+backend/*.user
+backend/*.vspscc
+backend/*.sln.docstates
+backend/appsettings.json
+tryPy/
+backend/Presentazione.Api/bin/
+backend/Presentazione.Api/obj/
 backend/
 tryPy/
 
