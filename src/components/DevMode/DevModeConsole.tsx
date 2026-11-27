@@ -4,7 +4,7 @@ import { Layers, Type, Palette, CheckSquare, MousePointer } from "lucide-react";
 import type { RightPanelTab } from "./hooks/useDevMode";
 import { SeoPanel, type SeoPanelProps } from "./panels/SeoPanel";
 import { TypographyPanel, type TypographyPanelProps } from "./panels/TypographyPanel";
-/* import {  ColorsPanel, type ColorsPanelProps } from "./panels/ColorsPanel";  */
+import { ColorsPanel, type ColorsPanelProps } from "./panels/ColorsPanel";
 import { NotesPanel, type NotesPanelProps } from "./panels/NotesPanel";
 import { SectionPanel, type SectionPanelProps } from "./panels/SectionPanel"; 
 
@@ -15,7 +15,7 @@ interface DevModeConsoleProps {
   // Props pass-through per i panel
   seoProps: SeoPanelProps;
   typoProps: TypographyPanelProps;
-  /* colorsProps?: ColorsPanelProps; */
+  colorsProps?: ColorsPanelProps;
   notesProps: NotesPanelProps;
   sectionProps: SectionPanelProps;
 }
@@ -31,7 +31,7 @@ const TABS: { id: RightPanelTab; label: string; icon: React.ElementType }[] = [
 
 export const DevModeConsole: React.FC<DevModeConsoleProps> = ({
   rightPanelTab, onTabChange, hasSelectedSection,
-  seoProps, typoProps, /* colorsProps, */ notesProps, sectionProps,
+  seoProps, typoProps, colorsProps, notesProps, sectionProps,
 }) => (
   <div className="devmode-right">
     <div className="console-tabs">

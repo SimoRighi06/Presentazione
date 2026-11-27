@@ -32,6 +32,8 @@ backend/appsettings.json
 tryPy/
 backend/Presentazione.Api/bin/
 backend/Presentazione.Api/obj/
+backend/
+tryPy/
 
 # Editor directories and files
 .vscode/*
@@ -45,4 +47,4 @@ backend/Presentazione.Api/obj/
 *.sw?
 .vercel
 .env
-.VITE_env 
+.VITE_env
